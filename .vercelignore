@@ -1,0 +1,11 @@
+# Ignore Python backend files from Vercel static build
+# Backend is deployed on Railway
+app.py
+*.py
+__pycache__/
+*.pyc
+requirements.txt
+runtime.txt
+Procfile
+railway.json
+.env*

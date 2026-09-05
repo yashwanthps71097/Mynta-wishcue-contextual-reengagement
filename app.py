@@ -295,6 +295,9 @@ class WishCueAppRequestHandler(http.server.SimpleHTTPRequestHandler):
 PORT = int(os.environ.get("PORT", 8000))
 HOST = os.environ.get("HOST", "0.0.0.0")
 Handler = WishCueAppRequestHandler
+handler = WishCueAppRequestHandler
+app = WishCueAppRequestHandler
+application = WishCueAppRequestHandler
 
 if __name__ == "__main__":
     socketserver.TCPServer.allow_reuse_address = True
