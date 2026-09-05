@@ -13,7 +13,13 @@ import uuid
 # =========================================================================
 def load_env_variables():
     env = {}
-    paths = [".env", ".env.example"]
+    paths = [
+        ".env",
+        ".env.example",
+        os.path.join(os.path.dirname(__file__), ".env"),
+        os.path.join(os.path.dirname(__file__), "..", ".env"),
+        os.path.join(os.path.dirname(__file__), "..", ".env.example")
+    ]
     for path in paths:
         if os.path.exists(path):
             try:
@@ -164,8 +170,18 @@ class WishCueAppRequestHandler(http.server.SimpleHTTPRequestHandler):
 
         # Route: Serve Main Frontend
         if parsed_url.path == "/" or parsed_url.path == "/index.html":
-            self.path = "index.html"
-            return http.server.SimpleHTTPRequestHandler.do_GET(self)
+            parent_index = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "index.html"))
+            if os.path.exists("index.html"):
+                self.path = "index.html"
+                return http.server.SimpleHTTPRequestHandler.do_GET(self)
+            elif os.path.exists(parent_index):
+                self.send_response(200)
+                self.send_header("Content-Type", "text/html; charset=utf-8")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.end_headers()
+                with open(parent_index, "rb") as f:
+                    self.wfile.write(f.read())
+                return
 
         return http.server.SimpleHTTPRequestHandler.do_GET(self)
 

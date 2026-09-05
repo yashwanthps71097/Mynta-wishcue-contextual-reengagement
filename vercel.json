@@ -1,10 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "cleanUrls": true,
-  "rewrites": [
-    {
-      "source": "/v1/:path*",
-      "destination": "https://YOUR_RAILWAY_URL.up.railway.app/v1/:path*"
-    }
-  ]
+  "cleanUrls": true
 }
