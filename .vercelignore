@@ -9,5 +9,7 @@ runtime.txt
 Procfile
 railway.json
 Dockerfile
+mise.toml
+nixpacks.toml
 backend/
 .env*
