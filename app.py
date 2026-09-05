@@ -30,8 +30,8 @@ def load_env_variables():
     return env
 
 ENV = load_env_variables()
-GROQ_API_KEY = ENV.get("GROQ_API_KEY")
-GROQ_MODEL = ENV.get("GROQ_MODEL", "llama3-8b-8192")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY") or ENV.get("GROQ_API_KEY")
+GROQ_MODEL = os.environ.get("GROQ_MODEL") or ENV.get("GROQ_MODEL", "llama3-8b-8192")
 
 # =========================================================================
 # Business Logic Components (Re-use from Phase 3)
