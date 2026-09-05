@@ -121,9 +121,26 @@ class WishCueAppRequestHandler(http.server.SimpleHTTPRequestHandler):
         # Handle CORS preflight requests from cross-origin frontend (e.g., Vercel)
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, HEAD")
         self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
         self.end_headers()
+
+    def do_HEAD(self):
+        parsed_url = urllib.parse.urlparse(self.path)
+        if parsed_url.path in ["/health", "/version", "/v1/analytics"]:
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            return
+        elif parsed_url.path in ["/", "/index.html"]:
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            return
+        # Delegate any other paths
+        http.server.SimpleHTTPRequestHandler.do_HEAD(self)
 
     def do_GET(self):
         parsed_url = urllib.parse.urlparse(self.path)
