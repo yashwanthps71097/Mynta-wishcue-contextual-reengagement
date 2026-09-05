@@ -1650,8 +1650,9 @@
         }
     }
 
-    // Configurable API base for Vercel / Railway cloud deployment
-    let API_BASE = (localStorage.getItem('wishcue_api_url') || window.ENV_API_BASE || '').replace(/\/$/, '');
+    // Live Production Railway Backend URL
+    const DEFAULT_RAILWAY_URL = 'https://mynta-wishcue-contextual-reengagement-production.up.railway.app';
+    let API_BASE = (localStorage.getItem('wishcue_api_url') || window.ENV_API_BASE || DEFAULT_RAILWAY_URL).replace(/\/$/, '');
 
     // Allow user / PO to connect Railway live backend directly in browser
     function promptBackendUrl() {

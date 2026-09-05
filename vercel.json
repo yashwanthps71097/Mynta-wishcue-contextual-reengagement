@@ -1,5 +1,15 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
-  "cleanUrls": true
+  "cleanUrls": true,
+  "rewrites": [
+    {
+      "source": "/v1/:path*",
+      "destination": "https://mynta-wishcue-contextual-reengagement-production.up.railway.app/v1/:path*"
+    },
+    {
+      "source": "/health",
+      "destination": "https://mynta-wishcue-contextual-reengagement-production.up.railway.app/health"
+    }
+  ]
 }
