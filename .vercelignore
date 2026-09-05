@@ -8,5 +8,6 @@ requirements.txt
 runtime.txt
 Procfile
 railway.json
+Dockerfile
 backend/
 .env*
