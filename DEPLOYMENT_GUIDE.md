@@ -54,7 +54,7 @@ git commit -m "feat: complete MVP design and cloud deployment configurations"
 
 # 4. Link your remote GitHub repository
 git branch -M main
-git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+git remote add origin https://github.com/yashwanthps71097/Mynta-wishcue-contextual-reengagement.git
 
 # 5. Push to GitHub
 git push -u origin main
@@ -71,21 +71,21 @@ Railway automatically detects Python via `requirements.txt` and starts the app v
 
 1. Log into **[Railway Dashboard](https://railway.app/dashboard)**.
 2. Click **+ New Project** $\rightarrow$ select **Deploy from GitHub repo**.
-3. Choose your repository.
+3. Choose your repository (`Mynta-wishcue-contextual-reengagement`).
 4. Click **Add Variables** and configure the following environment variables:
    * `GROQ_API_KEY`: `your_groq_api_key_here` (from console.groq.com)
    * `GROQ_MODEL`: `llama3-8b-8192`
    * *(Note: `PORT` and `HOST` are automatically injected by Railway).*
 5. Click **Settings** $\rightarrow$ scroll to **Networking** $\rightarrow$ click **Generate Domain**.
-6. Railway will assign you a public URL like:
+6. Railway assigned public URL:
    ```
-   https://wishcue-backend-production.up.railway.app
+   https://mynta-wishcue-contextual-reengagement-production.up.railway.app
    ```
 7. **Verify Railway Deployment:** Open your browser and navigate to:
    ```
-   https://YOUR_RAILWAY_URL.up.railway.app/health
+   https://mynta-wishcue-contextual-reengagement-production.up.railway.app/health
    ```
-   You should see:
+   You will see:
    ```json
    {"status": "healthy", "timestamp": "2026-..."}
    ```
@@ -98,7 +98,7 @@ Vercel provides instant global CDN caching for the static Myntra prototype.
 
 ### Method A: Reverse-Proxy via `vercel.json` (Recommended - Zero CORS)
 1. In your local repository, open [vercel.json](file:///c:/Users/ADMIN/Desktop/Product%20Owner%20Project%202/MVP%20Design/vercel.json).
-2. Replace `YOUR_RAILWAY_URL` with your actual Railway domain from Step 2:
+2. The proxy points to your live Railway domain:
    ```json
    {
      "$schema": "https://openapi.vercel.sh/vercel.json",
@@ -106,7 +106,11 @@ Vercel provides instant global CDN caching for the static Myntra prototype.
      "rewrites": [
        {
          "source": "/v1/:path*",
-         "destination": "https://wishcue-backend-production.up.railway.app/v1/:path*"
+         "destination": "https://mynta-wishcue-contextual-reengagement-production.up.railway.app/v1/:path*"
+       },
+       {
+         "source": "/health",
+         "destination": "https://mynta-wishcue-contextual-reengagement-production.up.railway.app/health"
        }
      ]
    }
@@ -118,11 +122,11 @@ Vercel provides instant global CDN caching for the static Myntra prototype.
    git push
    ```
 4. Go to **[Vercel Dashboard](https://vercel.com/dashboard)** $\rightarrow$ click **Add New...** $\rightarrow$ **Project**.
-5. Import your GitHub repository.
+5. Import your GitHub repository (`Mynta-wishcue-contextual-reengagement`).
 6. Leave Framework Preset as **Other** and click **Deploy**.
-7. Vercel will deploy your site to:
+7. Vercel deployed your site to:
    ```
-   https://your-project-name.vercel.app
+   https://mynta-wishcue-contextual-reengageme.vercel.app
    ```
 
 ---
@@ -131,12 +135,12 @@ Vercel provides instant global CDN caching for the static Myntra prototype.
 
 | Test Item | Action | Expected Outcome |
 | :--- | :--- | :--- |
-| **Backend Health** | Visit `https://YOUR_RAILWAY_URL/health` | HTTP 200 `{"status": "healthy"}` |
-| **API Endpoints** | Visit `https://YOUR_RAILWAY_URL/v1/analytics` | Returns JSON A/B metrics and latency stats |
-| **Frontend UI** | Open `https://YOUR_VERCEL_URL` | Myntra mobile frame loads with interactive feed |
-| **Micro-Nudge Trigger** | Type "Jacket" in search bar or click "Back In Stock" | Golden sparkle particle burst shoots from heart icon |
+| **Backend Health** | Visit `https://mynta-wishcue-contextual-reengagement-production.up.railway.app/health` | HTTP 200 `{"status": "healthy"}` |
+| **API Endpoints** | Visit `https://mynta-wishcue-contextual-reengagement-production.up.railway.app/v1/analytics` | Returns JSON A/B metrics and latency stats |
+| **Frontend UI** | Open `https://mynta-wishcue-contextual-reengageme.vercel.app` | Myntra mobile frame loads with interactive feed |
+| **Evaluator Sandbox** | Click any scenario (e.g. `Similar Search`, `Product Update`, `30-Day Window`) | Golden sparkle particle burst shoots from heart icon & status pill shows `● Live Cloud AI Triggered` |
 | **Floating Capsule** | Observe popup capsule | 5-second auto-dismiss and quick-dismiss (`X`) work |
-| **Telemetry & Metrics** | Click the capsule or switch to "Metrics Dashboard" tab | Conversion Lift (+46.8%) and Latency metrics update live |
+| **Telemetry & Metrics** | Click the capsule or switch to "WishCue" bottom tab | Conversion Lift (+47.5%) and Latency metrics update live |
 
 ---
 
