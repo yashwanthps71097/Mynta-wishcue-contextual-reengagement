@@ -137,6 +137,15 @@ class WishCueAppRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps({"status": "healthy", "timestamp": datetime.datetime.now().isoformat()}).encode("utf-8"))
             return
 
+        # Route: Version verification endpoint
+        if parsed_url.path == "/version":
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Access-Control-Allow-Origin", "*")
+            self.end_headers()
+            self.wfile.write(json.dumps({"version": "v2-clean-ui-docker", "status": "deployed"}).encode("utf-8"))
+            return
+
         # Route: Get Live Analytics Stats (Phase 5)
         if parsed_url.path == "/v1/analytics":
             self.handle_analytics_request()
@@ -173,10 +182,10 @@ class WishCueAppRequestHandler(http.server.SimpleHTTPRequestHandler):
             backend_index = os.path.join(os.path.dirname(__file__), "index.html")
             parent_index = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "index.html"))
             target = None
-            if os.path.exists("index.html"):
-                target = "index.html"
-            elif os.path.exists(backend_index):
+            if os.path.exists(backend_index):
                 target = backend_index
+            elif os.path.exists("index.html"):
+                target = "index.html"
             elif os.path.exists(parent_index):
                 target = parent_index
 
