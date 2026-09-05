@@ -1,0 +1,3 @@
+# WishCue Backend Dependencies
+# The backend uses Python's standard library (http.server, urllib, socketserver, json).
+# Gunicorn can be optionally used for production WSGI, or run directly via python app.py.

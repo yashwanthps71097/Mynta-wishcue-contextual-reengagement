@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Myntra — BOOM MVP Prototype</title>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --myntra-pink: #ff3f6c;
+            --myntra-pink-dark: #d53257;
+            --text-main: #282c3f;
+            --text-muted: #535766;
+            --border-color: #d4d5d9;
+            --bg-light: #f5f5f6;
+            --white: #ffffff;
+            --success-green: #03a685;
+            --badge-bg: rgba(255, 63, 108, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Assistant', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #2c2f33;
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Mobile Device Frame */
+        .device-container {
+            width: 100%;
+            max-width: 412px;
+            height: 847px;
+            background-color: var(--white);
+            border-radius: 40px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4), 0 0 0 12px #1a1c1e;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 36px;
+            background: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-main);
+            z-index: 1000;
+        }
+
+        .status-bar-icons span {
+            margin-left: 6px;
+        }
+
+        /* App Header */
+        .app-header {
+            height: 56px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 900;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 22px;
+            color: var(--myntra-pink);
+            letter-spacing: 0.5px;
+            cursor: pointer;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            position: relative;
+        }
+
+        .header-icon-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: var(--text-main);
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+        }
+
+        .header-icon-btn:hover {
+            background: var(--bg-light);
+        }
+
+        /* Wishlist Heart Glow Animation State */
+        .header-icon-btn.heart-glow {
+            animation: pulseGlow 1.2s infinite ease-in-out;
+            color: var(--myntra-pink);
+        }
+
+        .header-icon-btn.heart-glow::after {
+            content: '';
+            position: absolute;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255, 63, 108, 0.25);
+            animation: ripple 1.2s infinite ease-out;
+            z-index: -1;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(255,63,108,0.6)); }
+            50% { transform: scale(1.15); filter: drop-shadow(0 0 8px rgba(255,63,108,0.9)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(255,63,108,0.6)); }
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+
+        /* App Screens Viewport */
+        .app-viewport {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+            background: var(--bg-light);
+        }
+
+        .screen {
+            display: none;
+            min-height: 100%;
+            flex-direction: column;
+            background: var(--bg-light);
+            padding-bottom: 70px;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            height: 60px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 900;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            gap: 3px;
+        }
+
+        .nav-item i {
+            font-size: 18px;
+        }
+
+        .nav-item.active {
+            color: var(--myntra-pink);
+        }
+
+        /* Toast Confirmation */
+        .toast-notification {
+            position: absolute;
+            bottom: 75px;
+            left: 50%;
+            transform: translateX(-50%) translateY(50px);
+            background: rgba(40, 44, 63, 0.95);
+            color: var(--white);
+            padding: 10px 20px;
+            border-radius: 24px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1100;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast-notification i {
+            color: var(--myntra-pink);
+        }
+
+        /* Micro-Burst Floating Banner */
+        .micro-burst-banner {
+            position: absolute;
+            top: 60px;
+            right: 16px;
+            left: 16px;
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+            border: 1.5px solid var(--myntra-pink);
+            padding: 14px 16px;
+            z-index: 1200;
+            display: none;
+            animation: dropDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes dropDown {
+            0% { opacity: 0; transform: translateY(-15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .micro-burst-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 6px;
+        }
+
+        .micro-burst-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .micro-burst-close {
+            background: none;
+            border: none;
+            font-size: 14px;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 2px;
+        }
+
+        .micro-burst-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .micro-burst-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .btn-micro-action {
+            background: var(--myntra-pink);
+            color: var(--white);
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-micro-dismiss {
+            background: var(--bg-light);
+            color: var(--text-muted);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Demo Trigger Floating Controller */
+        .demo-controller {
+            position: absolute;
+            bottom: 70px;
+            left: 10px;
+            right: 10px;
+            background: rgba(40, 44, 63, 0.95);
+            backdrop-filter: blur(8px);
+            padding: 10px 14px;
+            border-radius: 12px;
+            z-index: 1500;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.15);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .demo-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: #ff3f6c;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .demo-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+        }
+
+        .demo-btn {
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 6px 4px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .demo-btn:hover {
+            background: var(--myntra-pink);
+            border-color: var(--myntra-pink);
+        }
+
+        /* Common Component Styling */
+        .banner-carousel {
+            background: linear-gradient(135deg, #fff0f3 0%, #ffe3ea 100%);
+            padding: 16px;
+            margin: 12px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .banner-text h2 {
+            font-size: 18px;
+            color: var(--text-main);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .banner-text p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .section-header {
+            padding: 12px 16px 8px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 0 12px 12px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .product-img-wrapper {
+            position: relative;
+            height: 210px;
+            background: #eaeaea;
+        }
+
+        .product-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .wishlist-btn-overlay {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--text-main);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .wishlist-btn-overlay.active {
+            color: var(--myntra-pink);
+        }
+
+        .product-info {
+            padding: 10px;
+        }
+
+        .brand-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 2px;
+        }
+
+        .product-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 6px;
+        }
+
+        .price-row {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+        }
+
+        .current-price {
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+
+        .discount-tag {
+            color: #ff905a;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Search Bar */
+        .search-container {
+            padding: 12px 16px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-bar {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: none;
+            outline: none;
+            font-size: 14px;
+            width: 100%;
+            color: var(--text-main);
+        }
+
+        /* Product Detail Page Styling */
+        .pdp-gallery {
+            position: relative;
+            height: 380px;
+            background: #fff;
+        }
+
+        .pdp-gallery img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pdp-details {
+            background: var(--white);
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+
+        .pdp-brand {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .pdp-title {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .pdp-price-box {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .pdp-current-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .pdp-tax-note {
+            font-size: 11px;
+            color: var(--success-green);
+            font-weight: 600;
+        }
+
+        .size-selector-section {
+            background: var(--white);
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+
+        .size-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .size-options {
+            display: flex;
+            gap: 10px;
+        }
+
+        .size-chip {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .size-chip.selected {
+            border-color: var(--myntra-pink);
+            color: var(--myntra-pink);
+            background: var(--badge-bg);
+        }
+
+        .pdp-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .pdp-desc {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            background: var(--white);
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+
+        /* Fixed Bottom Action Bar for PDP */
+        .pdp-bottom-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 950;
+        }
+
+        .btn-pdp-action {
+            flex: 1;
+            height: 44px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .btn-wishlist-pdp {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .btn-wishlist-pdp.active {
+            border-color: var(--myntra-pink);
+            color: var(--myntra-pink);
+            background: var(--badge-bg);
+        }
+
+        .btn-buy-pdp {
+            background: var(--myntra-pink);
+            border: none;
+            color: var(--white);
+        }
+
+        /* Behavior Shift Comparison Screen */
+        .comparison-container {
+            padding: 16px;
+        }
+
+        .comparison-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .comparison-header h2 {
+            font-size: 20px;
+            color: var(--text-main);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .comparison-header p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .flow-card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-left: 4px solid var(--border-color);
+        }
+
+        .flow-card.before {
+            border-left-color: var(--text-muted);
+        }
+
+        .flow-card.after {
+            border-left-color: var(--myntra-pink);
+            background: linear-gradient(to bottom, #ffffff, #fff8f9);
+        }
+
+        .flow-card-title {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .flow-step i {
+            color: var(--myntra-pink);
+            width: 16px;
+            text-align: center;
+        }
+
+        .flow-step span.muted {
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        .promise-box {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 1px dashed var(--myntra-pink);
+            margin-top: 10px;
+        }
+
+        .promise-box h4 {
+            font-size: 14px;
+            color: var(--myntra-pink);
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .promise-box p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        /* Utility classes */
+        .badge-pill {
+            background: var(--badge-bg);
+            color: var(--myntra-pink);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="device-container">
+    <div class="status-bar">
+        <span id="current-time">9:41</span>
+        <div class="status-bar-icons">
+            <span><i class="fa-solid fa-signal"></i></span>
+            <span><i class="fa-solid fa-wifi"></i></span>
+            <span><i class="fa-solid fa-battery-full"></i></span>
+        </div>
+    </div>
+
+    <header class="app-header">
+        <div class="header-left">
+            <div class="logo" onclick="switchScreen('screen-home')">myntra</div>
+        </div>
+        <div class="header-right">
+            <button class="header-icon-btn" onclick="switchScreen('screen-search')">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
+            <button class="header-icon-btn" id="wishlist-header-btn" onclick="switchScreen('screen-wishlist')">
+                <i class="fa-regular fa-heart" id="header-heart-icon"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="micro-burst-banner" id="micro-burst-banner">
+        <div class="micro-burst-header">
+            <div class="micro-burst-title" id="mb-title">💥 Your saved dress is worth another look 👀</div>
+            <button class="micro-burst-close" onclick="dismissMicroBurst()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="micro-burst-desc" id="mb-desc">Your size is back + there's a price update.</div>
+        <div class="micro-burst-actions">
+            <button class="btn-micro-dismiss" onclick="dismissMicroBurst()">✕ Dismiss</button>
+            <button class="btn-micro-action" onclick="takeLookFromBurst()">Take a Look →</button>
+        </div>
+    </div>
+
+    <div class="toast-notification" id="toast-notification">
+        <i class="fa-solid fa-heart"></i> <span id="toast-text">Added to Wishlist</span>
+    </div>
+
+    <div class="app-viewport">
+
+        <div class="screen active" id="screen-home">
+            <div class="banner-carousel">
+                <div class="banner-text">
+                    <span class="badge-pill">TRENDING NOW</span>
+                    <h2>Spring Romance Edit</h2>
+                    <p>Curated floral styles for sunny days</p>
+                </div>
+                <i class="fa-solid fa-shirt" style="font-size: 36px; color: var(--myntra-pink);"></i>
+            </div>
+            
+            <div class="section-header">
+                <span>Featured Dresses</span>
+                <span style="font-size: 12px; color: var(--myntra-pink); font-weight: 600;">View All</span>
+            </div>
+
+            <div class="product-grid">
+                <div class="product-card" onclick="openProductDetail()">
+                    <div class="product-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=500&q=80" alt="Floral Midi Dress">
+                        <button class="wishlist-btn-overlay" id="home-wishlist-icon" onclick="event.stopPropagation(); toggleWishlistFromHome(event);">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <div class="brand-name">H&M</div>
+                        <div class="product-title">Floral Midi Dress</div>
+                        <div class="price-row">
+                            <span class="current-price">₹1,499</span>
+                            <span class="original-price">₹2,999</span>
+                            <span class="discount-tag">(50% OFF)</span>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                            4.4 <i class="fa-solid fa-star" style="color: #ff905a; font-size: 10px;"></i> (1.4k)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" onclick="openProductDetail()">
+                    <div class="product-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=500&q=80" alt="Casual Summer Dress">
+                        <button class="wishlist-btn-overlay" onclick="event.stopPropagation();">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <div class="brand-name">MANGO</div>
+                        <div class="product-title">Satin Wrap Dress</div>
+                        <div class="price-row">
+                            <span class="current-price">₹2,290</span>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                            4.2 <i class="fa-solid fa-star" style="color: #ff905a; font-size: 10px;"></i> (890)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" onclick="openProductDetail()">
+                    <div class="product-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=500&q=80" alt="Pleated Dress">
+                        <button class="wishlist-btn-overlay" onclick="event.stopPropagation();">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <div class="brand-name">ZARA</div>
+                        <div class="product-title">Pleated Shirt Dress</div>
+                        <div class="price-row">
+                            <span class="current-price">₹2,990</span>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                            4.5 <i class="fa-solid fa-star" style="color: #ff905a; font-size: 10px;"></i> (2.1k)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" onclick="openProductDetail()">
+                    <div class="product-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1496747611176-843222e1e57c?auto=format&fit=crop&w=500&q=80" alt="Boho Dress">
+                        <button class="wishlist-btn-overlay" onclick="event.stopPropagation();">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <div class="brand-name">Roadster</div>
+                        <div class="product-title">Boho Maxi Dress</div>
+                        <div class="price-row">
+                            <span class="current-price">₹1,199</span>
+                            <span class="original-price">₹1,999</span>
+                        </div>
+                        <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                            4.1 <i class="fa-solid fa-star" style="color: #ff905a; font-size: 10px;"></i> (650)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-pdp">
+            <div class="pdp-gallery">
+                <img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=800&q=80" alt="Floral Midi Dress">
+                <div style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.6); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">1 / 4</div>
+            </div>
+
+            <div class="pdp-details">
+                <div class="pdp-brand">H&M</div>
+                <div class="pdp-title">Women Printed Floral Midi Dress</div>
+                <div class="pdp-price-box">
+                    <span class="pdp-current-price" id="pdp-price-display">₹1,499</span>
+                    <span class="original-price">₹2,999</span>
+                    <span class="discount-tag">(50% OFF)</span>
+                </div>
+                <div class="pdp-tax-note">inclusive of all taxes</div>
+            </div>
+
+            <div class="size-selector-section">
+                <div class="size-header">
+                    <span>SELECT SIZE</span>
+                    <span style="color: var(--myntra-pink); font-size: 12px;">Size Chart</span>
+                </div>
+                <div class="size-options">
+                    <div class="size-chip" onclick="selectSize(this)">XS</div>
+                    <div class="size-chip" onclick="selectSize(this)">S</div>
+                    <div class="size-chip selected" id="size-m-chip" onclick="selectSize(this)">M</div>
+                    <div class="size-chip" onclick="selectSize(this)">L</div>
+                    <div class="size-chip" onclick="selectSize(this)">XL</div>
+                </div>
+                <div id="stock-status-note" style="font-size: 12px; color: var(--success-green); margin-top: 8px; font-weight: 600;">
+                    ✓ Size M is in stock
+                </div>
+            </div>
+
+            <div class="pdp-desc">
+                <div class="pdp-section-title">PRODUCT DETAILS</div>
+                <p>Green and pink floral print midi dress. V-neck, short sleeves, flared hem. Lightweight woven viscose fabric, machine washable.</p>
+            </div>
+
+            <div class="pdp-desc">
+                <div class="pdp-section-title">RATINGS & REVIEWS (1.4K)</div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <span style="font-size: 18px; font-weight: 700;">4.4 <i class="fa-solid fa-star" style="color: #ff905a; font-size: 14px;"></i></span>
+                    <span style="font-size: 12px; color: var(--text-muted);">Verified Buyers</span>
+                </div>
+                <p style="font-style: italic; color: var(--text-main);">"Absolute favorite dress for brunch! Fits true to size and the fabric breathes very well." — Priya S.</p>
+            </div>
+
+            <div class="pdp-bottom-bar">
+                <button class="btn-pdp-action btn-wishlist-pdp" id="pdp-wishlist-btn" onclick="toggleWishlistFromPDP()">
+                    <i class="fa-regular fa-heart" id="pdp-heart-icon"></i> <span id="pdp-wishlist-text">WISHLIST</span>
+                </button>
+                <button class="btn-pdp-action btn-buy-pdp" onclick="switchScreen('screen-decision')">
+                    <i class="fa-solid fa-bag-shopping"></i> BUY NOW
+                </button>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-wishlist">
+            <div class="section-header">
+                <span>My Wishlist <span style="color: var(--text-muted); font-weight: normal;">(1 item)</span></span>
+            </div>
+            <div class="product-grid">
+                <div class="product-card" onclick="openProductDetail()">
+                    <div class="product-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=500&q=80" alt="Floral Midi Dress">
+                        <button class="wishlist-btn-overlay active">
+                            <i class="fa-solid fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <div class="brand-name">H&M</div>
+                        <div class="product-title">Floral Midi Dress</div>
+                        <div class="price-row">
+                            <span class="current-price">₹1,499</span>
+                            <span class="original-price">₹2,999</span>
+                        </div>
+                        <button style="width: 100%; margin-top: 8px; background: var(--myntra-pink); color: white; border: none; padding: 6px; border-radius: 4px; font-size: 12px; font-weight: 600;" onclick="event.stopPropagation(); switchScreen('screen-pdp');">
+                            Move to Bag
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-search">
+            <div class="search-container">
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-input-field" placeholder="Search for products, brands and more" value="" oninput="checkSearchTrigger(this.value)">
+                </div>
+            </div>
+            <div class="section-header">
+                <span>Popular Searches</span>
+            </div>
+            <div style="padding: 0 16px; display: flex; flex-wrap: wrap; gap: 8px;">
+                <span style="background: white; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 16px; font-size: 12px; cursor: pointer;" onclick="triggerSimilarSearchQuery()">Black party dress</span>
+                <span style="background: white; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 16px; font-size: 12px; cursor: pointer;">Floral midi dress</span>
+                <span style="background: white; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 16px; font-size: 12px; cursor: pointer;">Summer dresses</span>
+                <span style="background: white; border: 1px solid var(--border-color); padding: 6px 12px; border-radius: 16px; font-size: 12px; cursor: pointer;">Oversized tees</span>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-behavior">
+            <div class="comparison-container">
+                <div class="comparison-header">
+                    <h2>The BOOM Behavioral Shift</h2>
+                    <p>Turning passive wishlists into active purchase decisions without intrusive prompts.</p>
+                </div>
+
+                <div class="flow-card before">
+                    <div class="flow-card-title" style="color: var(--text-muted);">
+                        <i class="fa-solid fa-bookmark"></i> BEFORE BOOM (Passive Bookmark)
+                    </div>
+                    <div class="flow-steps">
+                        <div class="flow-step"><i class="fa-solid fa-heart"></i> Save to Wishlist</div>
+                        <div class="flow-step"><i class="fa-solid fa-hourglass"></i> Wait & Forget <span class="muted">(Out of sight, out of mind)</span></div>
+                        <div class="flow-step"><i class="fa-solid fa-triangle-exclamation" style="color: #f0ad4e;"></i> Postpone Decision <span class="muted">(Lost intent)</span></div>
+                        <div class="flow-step"><i class="fa-solid fa-xmark" style="color: #d9534f;"></i> Lost purchase opportunity</div>
+                    </div>
+                </div>
+
+                <div class="flow-card after">
+                    <div class="flow-card-title" style="color: var(--myntra-pink);">
+                        <i class="fa-solid fa-bolt"></i> WITH BOOM (Active Reconsideration)
+                    </div>
+                    <div class="flow-steps">
+                        <div class="flow-step"><i class="fa-solid fa-heart"></i> Save to Wishlist <span class="muted">(Zero surveys/friction)</span></div>
+                        <div class="flow-step"><i class="fa-solid fa-sparkles"></i> Heart Glow <span class="muted">(Subtle signal that something is waiting)</span></div>
+                        <div class="flow-step"><i class="fa-solid fa-explosion"></i> Micro-Burst <span class="muted">(Contextual trigger notification)</span></div>
+                        <div class="flow-step"><i class="fa-solid fa-hand-pointer"></i> One-Tap Revisit <span class="muted">(Instant product context)</span></div>
+                        <div class="flow-step"><i class="fa-solid fa-bag-shopping"></i> Decide <span class="muted">(Buy Now or Keep in Wishlist)</span></div>
+                    </div>
+                </div>
+
+                <div class="promise-box">
+                    <h4>THE BOOM PROMISE</h4>
+                    <p>"BOOM doesn't push shoppers to buy. It helps them decide when they're ready through Timing + Information + Convenience."</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-decision">
+            <div style="padding: 30px 16px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                <div style="width: 70px; height: 70px; background: rgba(3, 166, 133, 0.1); color: var(--success-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 16px;">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h2 style="font-size: 22px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Decision Complete!</h2>
+                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5;">
+                    You successfully transitioned from a passive wishlist item to an active purchase decision using <strong>BOOM</strong>.
+                </p>
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; width: 100%; text-align: left; margin-bottom: 24px;">
+                    <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">ORDER SUMMARY</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px;">
+                        <span>H&M Floral Midi Dress (Size M)</span>
+                        <span style="font-weight: 700;">₹1,499</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--success-green);">
+                        <span>BOOM Re-engagement Conversion</span>
+                        <span>Successful</span>
+                    </div>
+                </div>
+                <button onclick="switchScreen('screen-home'); resetDemoState();" style="background: var(--myntra-pink); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 700; width: 100%; cursor: pointer;">
+                    Restart Prototype Journey
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="demo-controller">
+        <div class="demo-title">
+            <span>⚡ BOOM Evaluator Demo Mode</span>
+            <span style="font-size: 10px; opacity: 0.8;" id="demo-status">Idle</span>
+        </div>
+        <div class="demo-buttons">
+            <button class="demo-btn" onclick="triggerBoomScenario('search')">🔎 Similar Search</button>
+            <button class="demo-btn" onclick="triggerBoomScenario('update')">🔔 Product Update</button>
+            <button class="demo-btn" onclick="triggerBoomScenario('days')">⏳ 30-Day Window</button>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active" id="nav-home" onclick="switchScreen('screen-home')">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </button>
+        <button class="nav-item" id="nav-search" onclick="switchScreen('screen-search')">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Search</span>
+        </button>
+        <button class="nav-item" id="nav-wishlist" onclick="switchScreen('screen-wishlist')">
+            <i class="fa-regular fa-heart"></i>
+            <span>Wishlist</span>
+        </button>
+        <button class="nav-item" id="nav-behavior" onclick="switchScreen('screen-behavior')">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>BOOM Loop</span>
+        </button>
+    </nav>
+</div>
+
+<script>
+    // Live Clock Update
+    function updateClock() {
+        const now = new Date();
+        let hours = now.getHours();
+        let minutes = now.getMinutes();
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        document.getElementById('current-time').innerText = `${hours}:${minutes}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // App State Management
+    let isWishlisted = false;
+    let currentScenarioData = {};
+
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+
+        // Update Bottom Nav Active State
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
+        if(screenId === 'screen-home') document.getElementById('nav-home').classList.add('active');
+        if(screenId === 'screen-search') document.getElementById('nav-search').classList.add('active');
+        if(screenId === 'screen-wishlist') document.getElementById('nav-wishlist').classList.add('active');
+        if(screenId === 'screen-behavior') document.getElementById('nav-behavior').classList.add('active');
+
+        // Close micro-burst if navigating away
+        if(screenId !== 'screen-home') {
+            document.getElementById('micro-burst-banner').style.display = 'none';
+        }
+
+        // Scroll viewport to top
+        document.querySelector('.app-viewport').scrollTop = 0;
+    }
+
+    // Toast Message Controller
+    function showToast(message) {
+        const toast = document.getElementById('toast-notification');
+        document.getElementById('toast-text').innerText = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2000);
+    }
+
+    // Toggle Wishlist from Home Card
+    function toggleWishlistFromHome(e) {
+        isWishlisted = !isWishlisted;
+        const btn = document.getElementById('home-wishlist-icon');
+        const pdpBtn = document.getElementById('pdp-wishlist-btn');
+        const pdpHeart = document.getElementById('pdp-heart-icon');
+        const pdpText = document.getElementById('pdp-wishlist-text');
+
+        if(isWishlisted) {
+            btn.classList.add('active');
+            btn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+            showToast('Added to Wishlist');
+            
+            if(pdpBtn) {
+                pdpBtn.classList.add('active');
+                pdpHeart.className = "fa-solid fa-heart";
+                pdpText.innerText = "WISHLISTED";
+            }
+        } else {
+            btn.classList.remove('active');
+            btn.innerHTML = '<i class="fa-regular fa-heart"></i>';
+            showToast('Removed from Wishlist');
+            
+            if(pdpBtn) {
+                pdpBtn.classList.remove('active');
+                pdpHeart.className = "fa-regular fa-heart";
+                pdpText.innerText = "WISHLIST";
+            }
+        }
+    }
+
+    // Toggle Wishlist from PDP
+    function toggleWishlistFromPDP() {
+        isWishlisted = !isWishlisted;
+        const btn = document.getElementById('pdp-wishlist-btn');
+        const heart = document.getElementById('pdp-heart-icon');
+        const text = document.getElementById('pdp-wishlist-text');
+        const homeBtn = document.getElementById('home-wishlist-icon');
+
+        if(isWishlisted) {
+            btn.classList.add('active');
+            heart.className = "fa-solid fa-heart";
+            text.innerText = "WISHLISTED";
+            if(homeBtn) {
+                homeBtn.classList.add('active');
+                homeBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+            }
+            showToast('Added to Wishlist');
+        } else {
+            btn.classList.remove('active');
+            heart.className = "fa-regular fa-heart";
+            text.innerText = "WISHLIST";
+            if(homeBtn) {
+                homeBtn.classList.remove('active');
+                homeBtn.innerHTML = '<i class="fa-regular fa-heart"></i>';
+            }
+            showToast('Removed from Wishlist');
+        }
+    }
+
+    function selectSize(element) {
+        document.querySelectorAll('.size-chip').forEach(chip => chip.classList.remove('selected'));
+        element.classList.add('selected');
+    }
+
+    function openProductDetail() {
+        // Ensure wishlist state syncs to PDP
+        const pdpBtn = document.getElementById('pdp-wishlist-btn');
+        const pdpHeart = document.getElementById('pdp-heart-icon');
+        const pdpText = document.getElementById('pdp-wishlist-text');
+        
+        if(isWishlisted) {
+            pdpBtn.classList.add('active');
+            pdpHeart.className = "fa-solid fa-heart";
+            pdpText.innerText = "WISHLISTED";
+        } else {
+            pdpBtn.classList.remove('active');
+            pdpHeart.className = "fa-regular fa-heart";
+            pdpText.innerText = "WISHLIST";
+        }
+
+        switchScreen('screen-pdp');
+    }
+
+    // Trigger BOOM Scenarios (Evaluator Control)
+    function triggerBoomScenario(type) {
+        // First ensure user is on home screen for best experience
+        switchScreen('screen-home');
+
+        const headerBtn = document.getElementById('wishlist-header-btn');
+        const headerHeart = document.getElementById('header-heart-icon');
+        const banner = document.getElementById('micro-burst-banner');
+        const titleEl = document.getElementById('mb-title');
+        const descEl = document.getElementById('mb-desc');
+        const demoStatus = document.getElementById('demo-status');
+
+        // 1. ❤️✨ HEART GLOW TRIGGER
+        headerBtn.classList.add('heart-glow');
+        headerHeart.className = "fa-solid fa-heart";
+
+        // Configure Scenario specific messages
+        if(type === 'search') {
+            demoStatus.innerText = "Trigger: Similar Search";
+            titleEl.innerHTML = "💥 Still looking for something like this? 👀";
+            descEl.innerText = "You just searched for a style similar to your saved H&M floral dress.";
+        } else if(type === 'update') {
+            demoStatus.innerText = "Trigger: Product Update";
+            titleEl.innerHTML = "💥 The size you wanted is back! 🎯";
+            descEl.innerText = "Size M is back in stock • Price updated to ₹1,499.";
+        } else if(type === 'days') {
+            demoStatus.innerText = "Trigger: 30-Day Window";
+            titleEl.innerHTML = "💥 Still thinking about this one? 👀";
+            descEl.innerText = "You've had it saved for 24 days. Approaching your 30-day window.";
+        }
+
+        // 2. 💥 MICRO-BURST POPUP AFTER GLOW ANIMATION (0.8s delay)
+        setTimeout(() => {
+            banner.style.display = 'block';
+        }, 900);
+    }
+
+    function dismissMicroBurst() {
+        document.getElementById('micro-burst-banner').style.display = 'none';
+        document.getElementById('wishlist-header-btn').classList.remove('heart-glow');
+        document.getElementById('demo-status').innerText = "Dismissed (Browsing continues)";
+    }
+
+    function takeLookFromBurst() {
+        document.getElementById('micro-burst-banner').style.display = 'none';
+        document.getElementById('wishlist-header-btn').classList.remove('heart-glow');
+        document.getElementById('demo-status').innerText = "Revisited via BOOM";
+        openProductDetail();
+    }
+
+    function checkSearchTrigger(val) {
+        if(val.toLowerCase().includes('party dress') || val.toLowerCase().includes('black')) {
+            // Automatically trigger Scenario A on search keyword match
+            setTimeout(() => {
+                triggerBoomScenario('search');
+            }, 600);
+        }
+    }
+
+    function triggerSimilarSearchQuery() {
+        document.getElementById('search-input-field').value = "Black party dress";
+        triggerBoomScenario('search');
+    }
+
+    function resetDemoState() {
+        isWishlisted = false;
+        document.getElementById('home-wishlist-icon').classList.remove('active');
+        document.getElementById('home-wishlist-icon').innerHTML = '<i class="fa-regular fa-heart"></i>';
+        document.getElementById('header-heart-icon').className = "fa-regular fa-heart";
+        document.getElementById('wishlist-header-btn').classList.remove('heart-glow');
+        document.getElementById('micro-burst-banner').style.display = 'none';
+        document.getElementById('demo-status').innerText = "Idle";
+    }
+</script>
+
+</body>
+</html>

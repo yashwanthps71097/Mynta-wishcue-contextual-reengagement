@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Myntra — WishCue MVP Prototype</title>
+    <link href="https://fonts.googleapis.com/css2?family=Assistant:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --myntra-pink: #ff3f6c;
+            --myntra-pink-dark: #d53257;
+            --text-main: #282c3f;
+            --text-muted: #535766;
+            --border-color: #d4d5d9;
+            --bg-light: #f5f5f6;
+            --white: #ffffff;
+            --success-green: #03a685;
+            --badge-bg: rgba(255, 63, 108, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Assistant', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: #2c2f33;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px 16px;
+        }
+
+        /* Desktop Scale Controller Toolbar */
+        .desktop-controls-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #1a1c1e;
+            padding: 8px 20px;
+            border-radius: 30px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.45);
+            margin-bottom: 18px;
+            color: #d4d5d9;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 2000;
+        }
+
+        .desktop-controls-bar span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: #fff;
+        }
+
+        .size-btn {
+            background: #2c2f33;
+            border: 1px solid #484b51;
+            color: #f5f5f6;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .size-btn:hover {
+            background: #3e4247;
+            border-color: var(--myntra-pink);
+        }
+
+        .size-btn.active {
+            background: var(--myntra-pink);
+            border-color: var(--myntra-pink);
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(255, 63, 108, 0.4);
+        }
+
+        /* Mobile Device Frame */
+        .device-container {
+            width: 100%;
+            max-width: 480px;
+            height: 920px;
+            background-color: var(--white);
+            border-radius: 42px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4), 0 0 0 12px #1a1c1e;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), zoom 0.25s ease;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            height: 40px;
+            background: var(--white);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+            z-index: 1000;
+        }
+
+        .status-bar-icons span {
+            margin-left: 6px;
+        }
+
+        /* App Header */
+        .app-header {
+            height: 64px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 14px;
+            z-index: 900;
+        }
+
+        /* Header Search Capsule */
+        .header-search-bar {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 8px 14px;
+            margin-right: 10px;
+            gap: 10px;
+            cursor: pointer;
+        }
+
+        .header-search-logo {
+            font-weight: 900;
+            font-size: 19px;
+            background: linear-gradient(45deg, #ff3f6c 0%, #ff905a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-search-text {
+            font-size: 15px;
+            color: var(--text-muted);
+            flex: 1;
+        }
+
+        .header-search-icons {
+            display: flex;
+            gap: 12px;
+            color: var(--text-muted);
+            font-size: 15px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            position: relative;
+        }
+
+        .header-icon-btn {
+            background: none;
+            border: none;
+            font-size: 22px;
+            color: var(--text-main);
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .header-icon-btn:hover {
+            background: var(--bg-light);
+        }
+
+        /* Wishlist Heart Glow Animation State */
+        .header-icon-btn.heart-glow {
+            animation: pulseGlow 1.2s infinite ease-in-out;
+            color: var(--myntra-pink);
+        }
+
+        .header-icon-btn.heart-glow::after {
+            content: '';
+            position: absolute;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255, 63, 108, 0.25);
+            animation: ripple 1.2s infinite ease-out;
+            z-index: -1;
+        }
+
+        @keyframes pulseGlow {
+            0% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(255,63,108,0.6)); }
+            50% { transform: scale(1.15); filter: drop-shadow(0 0 8px rgba(255,63,108,0.9)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 2px rgba(255,63,108,0.6)); }
+        }
+
+        @keyframes ripple {
+            0% { transform: scale(0.8); opacity: 1; }
+            100% { transform: scale(1.6); opacity: 0; }
+        }
+
+        /* App Screens Viewport */
+        .app-viewport {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+            background: var(--bg-light);
+        }
+
+        .screen {
+            display: none;
+            min-height: 100%;
+            flex-direction: column;
+            background: var(--bg-light);
+            padding-bottom: 70px;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            height: 68px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 900;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            gap: 4px;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+        }
+
+        .nav-item.active {
+            color: var(--myntra-pink);
+        }
+
+        /* Toast Confirmation */
+        .toast-notification {
+            position: absolute;
+            bottom: 85px;
+            left: 50%;
+            transform: translateX(-50%) translateY(50px);
+            background: rgba(40, 44, 63, 0.95);
+            color: var(--white);
+            padding: 12px 24px;
+            border-radius: 28px;
+            font-size: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.25);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1100;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .toast-notification.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .toast-notification i {
+            color: var(--myntra-pink);
+        }
+
+        /* Sparkle Particle Animation */
+        .sparkle-particle {
+            position: absolute;
+            width: 9px;
+            height: 9px;
+            background: radial-gradient(circle, #ffe066 0%, #f5b041 100%);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1300;
+            box-shadow: 0 0 10px #f39c12;
+            animation: sparkle-burst-out 0.8s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        @keyframes sparkle-burst-out {
+            0% {
+                transform: translate(0, 0) scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: translate(var(--tx), var(--ty)) scale(0);
+                opacity: 0;
+            }
+        }
+
+        /* Micro-Burst Floating Capsule (Sleek and Non-intrusive) */
+        .micro-burst-banner {
+            position: absolute;
+            top: 66px;
+            right: 16px;
+            width: 340px;
+            background: linear-gradient(135deg, #ffffff 0%, #fffaf0 100%);
+            border-radius: 14px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.18);
+            border: 1.5px solid #ffd700; /* Subtle Gold Border */
+            padding: 14px 16px;
+            z-index: 1200;
+            display: none;
+            animation: dropDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            cursor: pointer;
+        }
+
+        @keyframes dropDown {
+            0% { opacity: 0; transform: translateY(-10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .micro-burst-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .micro-burst-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .micro-burst-close {
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 2px;
+        }
+
+        .micro-burst-desc {
+            font-size: 15.5px;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        /* Hidden actions since clicking the pill itself performs the action */
+        .micro-burst-actions {
+            display: none;
+        }
+
+        /* Demo Trigger Floating Controller */
+        .demo-controller {
+            position: absolute;
+            bottom: 78px;
+            left: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(8px);
+            padding: 12px 14px;
+            border-radius: 14px;
+            z-index: 1500;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .demo-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--myntra-pink);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .demo-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .demo-btn {
+            background: var(--bg-light);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 9px 4px;
+            border-radius: 8px;
+            font-size: 14.5px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .demo-btn:hover {
+            background: var(--myntra-pink);
+            border-color: var(--myntra-pink);
+            color: var(--white);
+        }
+
+        /* Common Component Styling */
+        .banner-carousel {
+            background: linear-gradient(135deg, #fff0f3 0%, #ffe3ea 100%);
+            padding: 18px;
+            margin: 14px;
+            border-radius: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .banner-text h2 {
+            font-size: 22px;
+            color: var(--text-main);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .banner-text p {
+            font-size: 15px;
+            color: var(--text-muted);
+        }
+
+        .section-header {
+            padding: 14px 16px 10px;
+            font-size: 17px;
+            font-weight: 700;
+            color: var(--text-main);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            padding: 0 14px 14px;
+        }
+
+        .product-card {
+            background: var(--white);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .product-img-wrapper {
+            position: relative;
+            height: 235px;
+            background: #eaeaea;
+        }
+
+        .product-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .wishlist-btn-overlay {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255,255,255,0.92);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--text-main);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        }
+
+        .wishlist-btn-overlay.active {
+            color: var(--myntra-pink);
+        }
+
+        .product-info {
+            padding: 12px 14px 14px;
+        }
+
+        .brand-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 3px;
+        }
+
+        .product-title {
+            font-size: 14.5px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 6px;
+        }
+
+        .price-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 15px;
+        }
+
+        .current-price {
+            font-weight: 700;
+            font-size: 16.5px;
+            color: var(--text-main);
+        }
+
+        .original-price {
+            text-decoration: line-through;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .discount-tag {
+            color: #ff905a;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        /* Search Bar */
+        .search-container {
+            padding: 14px 16px;
+            background: var(--white);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-bar {
+            background: var(--bg-light);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        .search-bar input {
+            border: none;
+            background: none;
+            outline: none;
+            font-size: 16px;
+            width: 100%;
+            color: var(--text-main);
+        }
+
+        /* Product Detail Page Styling */
+        .pdp-gallery {
+            position: relative;
+            height: 380px;
+            background: #fff;
+        }
+
+        .pdp-gallery img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .pdp-details {
+            background: var(--white);
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+
+        .pdp-brand {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .pdp-title {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .pdp-price-box {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .pdp-current-price {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .pdp-tax-note {
+            font-size: 13px;
+            color: var(--success-green);
+            font-weight: 600;
+        }
+
+        .size-selector-section {
+            background: var(--white);
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+
+        .size-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .size-options {
+            display: flex;
+            gap: 12px;
+        }
+
+        .size-chip {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .size-chip.selected {
+            border-color: var(--myntra-pink);
+            color: var(--myntra-pink);
+            background: var(--badge-bg);
+        }
+
+        .pdp-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 6px;
+        }
+
+        .pdp-desc {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.5;
+            background: var(--white);
+            padding: 16px;
+            margin-bottom: 8px;
+        }
+
+        /* Fixed Bottom Action Bar for PDP */
+        .pdp-bottom-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: var(--white);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 16px;
+            gap: 12px;
+            z-index: 950;
+        }
+
+        .btn-pdp-action {
+            flex: 1;
+            height: 48px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .btn-wishlist-pdp {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+        }
+
+        .btn-wishlist-pdp.active {
+            border-color: var(--myntra-pink);
+            color: var(--myntra-pink);
+            background: var(--badge-bg);
+        }
+
+        .btn-buy-pdp {
+            background: var(--myntra-pink);
+            border: none;
+            color: var(--white);
+        }
+
+        /* Behavior Shift Comparison Screen */
+        .comparison-container {
+            padding: 16px;
+        }
+
+        .comparison-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .comparison-header h2 {
+            font-size: 24px;
+            color: var(--text-main);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .comparison-header p {
+            font-size: 15px;
+            color: var(--text-muted);
+        }
+
+        .flow-card {
+            background: var(--white);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-left: 4px solid var(--border-color);
+        }
+
+        .flow-card.before {
+            border-left-color: var(--text-muted);
+        }
+
+        .flow-card.after {
+            border-left-color: var(--myntra-pink);
+            background: linear-gradient(to bottom, #ffffff, #fff8f9);
+        }
+
+        .flow-card-title {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 15px;
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .flow-step i {
+            color: var(--myntra-pink);
+            width: 18px;
+            text-align: center;
+        }
+
+        .flow-step span.muted {
+            color: var(--text-muted);
+            font-weight: normal;
+        }
+
+        .promise-box {
+            background: var(--white);
+            border-radius: 14px;
+            padding: 18px;
+            text-align: center;
+            border: 1px dashed var(--myntra-pink);
+            margin-top: 10px;
+        }
+
+        .promise-box h4 {
+            font-size: 16px;
+            color: var(--myntra-pink);
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        .promise-box p {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+
+        /* Utility classes */
+        .badge-pill {
+            background: var(--badge-bg);
+            color: var(--myntra-pink);
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="desktop-controls-bar">
+    <span><i class="fa-solid fa-desktop"></i> Display Size:</span>
+    <button class="size-btn" onclick="setDisplayScale(1, this)">Default (100%)</button>
+    <button class="size-btn active" onclick="setDisplayScale(1.15, this)">Large (115%)</button>
+    <button class="size-btn" onclick="setDisplayScale(1.3, this)">Extra Large (130%)</button>
+</div>
+
+<div class="device-container" id="device-container">
+    <div class="status-bar">
+        <span id="current-time">9:41</span>
+        <div class="status-bar-icons">
+            <span><i class="fa-solid fa-signal"></i></span>
+            <span><i class="fa-solid fa-wifi"></i></span>
+            <span><i class="fa-solid fa-battery-full"></i></span>
+        </div>
+    </div>
+
+    <header class="app-header">
+        <div class="header-search-bar" onclick="switchScreen('screen-search')">
+            <span class="header-search-logo">M</span>
+            <span class="header-search-text">"Shoes"</span>
+            <div class="header-search-icons">
+                <i class="fa-solid fa-microphone"></i>
+                <i class="fa-solid fa-camera"></i>
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="header-icon-btn">
+                <i class="fa-regular fa-bell"></i>
+            </button>
+            <button class="header-icon-btn" id="wishlist-header-btn" onclick="switchScreen('screen-wishlist')">
+                <i class="fa-regular fa-heart" id="header-heart-icon"></i>
+            </button>
+            <button class="header-icon-btn">
+                <i class="fa-regular fa-user"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="micro-burst-banner" id="micro-burst-banner" onclick="takeLookFromBurst()">
+        <div class="micro-burst-header">
+            <div class="micro-burst-title" id="mb-title">💥 Your saved jacket is worth another look 👀</div>
+            <button class="micro-burst-close" onclick="event.stopPropagation(); dismissMicroBurst()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="micro-burst-desc" id="mb-desc">Your size is back + there's a price update.</div>
+    </div>
+
+    <div class="toast-notification" id="toast-notification">
+        <i class="fa-solid fa-heart"></i> <span id="toast-text">Added to Wishlist</span>
+    </div>
+
+    <div class="app-viewport">
+
+        <div class="screen active" id="screen-home">
+            <div class="banner-carousel">
+                <div class="banner-text">
+                    <span class="badge-pill">TRENDING NOW</span>
+                    <h2>Spring Romance Edit</h2>
+                    <p>Curated floral styles for sunny days</p>
+                </div>
+                <i class="fa-solid fa-shirt" style="font-size: 40px; color: var(--myntra-pink);"></i>
+            </div>
+            
+            <div class="section-header">
+                <span>Featured Menswear</span>
+                <span style="font-size: 14px; color: var(--myntra-pink); font-weight: 700; cursor: pointer;" onclick="switchScreen('screen-search')">View All</span>
+            </div>
+
+            <div class="product-grid">
+                <div class="product-card" onclick="openProductDetail()">
+                    <div class="product-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=500&q=80" alt="Textured Bomber Jacket">
+                        <button class="wishlist-btn-overlay active" id="home-wishlist-icon" onclick="event.stopPropagation(); toggleWishlistFromHome(event);">
+                            <i class="fa-solid fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <div class="brand-name">H&M</div>
+                        <div class="product-title">Men Bomber Jacket</div>
+                        <div class="price-row">
+                            <span class="current-price">₹1,999</span>
+                            <span class="original-price">₹3,999</span>
+                            <span class="discount-tag">(50% OFF)</span>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 600;">
+                            4.4 <i class="fa-solid fa-star" style="color: #ff905a; font-size: 12px;"></i> (1.4k)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" onclick="openProductDetail()">
+                    <div class="product-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=500&q=80" alt="Slim Fit Shirt">
+                        <button class="wishlist-btn-overlay" onclick="toggleWishlistProduct(event, this, 'MANGO Shirt')">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <div class="brand-name">MANGO</div>
+                        <div class="product-title">Slim Fit Solid Shirt</div>
+                        <div class="price-row">
+                            <span class="current-price">₹2,290</span>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 600;">
+                            4.2 <i class="fa-solid fa-star" style="color: #ff905a; font-size: 12px;"></i> (890)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" onclick="openProductDetail()">
+                    <div class="product-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=500&q=80" alt="Textured Blazer">
+                        <button class="wishlist-btn-overlay" onclick="toggleWishlistProduct(event, this, 'ZARA Blazer')">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <div class="brand-name">ZARA</div>
+                        <div class="product-title">Textured Slim Blazer</div>
+                        <div class="price-row">
+                            <span class="current-price">₹4,990</span>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 600;">
+                            4.5 <i class="fa-solid fa-star" style="color: #ff905a; font-size: 12px;"></i> (2.1k)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="product-card" onclick="openProductDetail()">
+                    <div class="product-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?auto=format&fit=crop&w=500&q=80" alt="Denim Jacket">
+                        <button class="wishlist-btn-overlay" onclick="toggleWishlistProduct(event, this, 'Roadster Denim Jacket')">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <div class="brand-name">Roadster</div>
+                        <div class="product-title">Casual Denim Jacket</div>
+                        <div class="price-row">
+                            <span class="current-price">₹1,799</span>
+                            <span class="original-price">₹2,999</span>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 600;">
+                            4.1 <i class="fa-solid fa-star" style="color: #ff905a; font-size: 12px;"></i> (650)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-pdp">
+            <div class="pdp-gallery">
+                <img src="https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=800&q=80" alt="Men Bomber Jacket">
+                <div style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.6); color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px;">1 / 4</div>
+            </div>
+
+            <div class="pdp-details">
+                <div class="pdp-brand">H&M</div>
+                <div class="pdp-title">Men Textured Bomber Jacket</div>
+                <div class="pdp-price-box">
+                    <span class="pdp-current-price" id="pdp-price-display">₹1,999</span>
+                    <span class="original-price">₹3,999</span>
+                    <span class="discount-tag">(50% OFF)</span>
+                </div>
+                <div class="pdp-tax-note">inclusive of all taxes</div>
+            </div>
+
+            <div class="size-selector-section">
+                <div class="size-header">
+                    <span>SELECT SIZE</span>
+                    <span style="color: var(--myntra-pink); font-size: 12px;">Size Chart</span>
+                </div>
+                <div class="size-options">
+                    <div class="size-chip">S</div>
+                    <div class="size-chip selected" id="size-m-chip">M</div>
+                    <div class="size-chip">L</div>
+                    <div class="size-chip">XL</div>
+                    <div class="size-chip">XXL</div>
+                </div>
+                <div id="stock-status-note" style="font-size: 12px; color: var(--success-green); margin-top: 8px; font-weight: 600;">
+                    ✓ Size M is in stock
+                </div>
+            </div>
+
+            <div class="pdp-desc">
+                <div class="pdp-section-title">PRODUCT DETAILS</div>
+                <p>Black textured bomber jacket. Front zip closure, long sleeves, ribbed trims. Premium heavy-knit cotton blend fabric, machine washable.</p>
+            </div>
+
+            <div class="pdp-desc">
+                <div class="pdp-section-title">RATINGS & REVIEWS (1.4K)</div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                    <span style="font-size: 18px; font-weight: 700;">4.4 <i class="fa-solid fa-star" style="color: #ff905a; font-size: 14px;"></i></span>
+                    <span style="font-size: 12px; color: var(--text-muted);">Verified Buyers</span>
+                </div>
+                <p style="font-style: italic; color: var(--text-main);">"Perfect bomber jacket! The fit is outstanding and the material feels incredibly premium." — Rohan S.</p>
+            </div>
+
+            <div class="pdp-bottom-bar">
+                <button class="btn-pdp-action btn-wishlist-pdp active" id="pdp-wishlist-btn" onclick="toggleWishlistFromPDP()">
+                    <i class="fa-solid fa-heart" id="pdp-heart-icon"></i> <span id="pdp-wishlist-text">WISHLISTED</span>
+                </button>
+                <button class="btn-pdp-action btn-buy-pdp" onclick="switchScreen('screen-decision')">
+                    <i class="fa-solid fa-bag-shopping"></i> BUY NOW
+                </button>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-wishlist">
+            <div class="section-header">
+                <span>My Wishlist <span style="color: var(--text-muted); font-weight: normal;" id="wishlist-count-label">(1 item)</span></span>
+            </div>
+            <div class="product-grid" id="wishlist-product-grid">
+                <!-- Wishlist items dynamically populated by JavaScript -->
+            </div>
+        </div>
+
+        <div class="screen" id="screen-search">
+            <div class="search-container">
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-input-field" placeholder="Search for products, brands and more" value="" oninput="checkSearchTrigger(this.value)">
+                </div>
+            </div>
+            <div class="section-header">
+                <span>Popular Searches</span>
+            </div>
+            <div style="padding: 0 16px; display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+                <span style="background: white; border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer;" onclick="triggerSimilarSearchQuery('Black party dress')">Black party dress</span>
+                <span style="background: white; border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer;" onclick="triggerSimilarSearchQuery('Floral midi dress')">Floral midi dress</span>
+                <span style="background: white; border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer;" onclick="triggerSimilarSearchQuery('Summer dresses')">Summer dresses</span>
+                <span style="background: white; border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer;" onclick="triggerSimilarSearchQuery('Oversized tees')">Oversized tees</span>
+            </div>
+
+            <div class="section-header">
+                <span>Trending Dresses & Styles</span>
+                <span style="font-size: 14px; color: var(--myntra-pink); font-weight: 700;">Explore All</span>
+            </div>
+
+            <div class="product-grid" id="search-product-grid">
+                <!-- Product 1: Floral Midi Dress -->
+                <div class="product-card" onclick="openProductDetail()">
+                    <div class="product-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=500&q=80" alt="Floral Printed A-Line Dress">
+                        <button class="wishlist-btn-overlay" onclick="toggleWishlistProduct(event, this, 'Berrylush Floral Midi Dress')">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <div class="brand-name">Berrylush</div>
+                        <div class="product-title">Floral Printed A-Line Dress</div>
+                        <div class="price-row">
+                            <span class="current-price">₹1,299</span>
+                            <span class="original-price">₹2,599</span>
+                            <span class="discount-tag">(50% OFF)</span>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 600;">
+                            4.3 <i class="fa-solid fa-star" style="color: #ff905a; font-size: 12px;"></i> (2.8k)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 2: Black Party Dress -->
+                <div class="product-card" onclick="openProductDetail()">
+                    <div class="product-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=500&q=80" alt="Bodycon Black Party Dress">
+                        <button class="wishlist-btn-overlay" onclick="toggleWishlistProduct(event, this, 'Vero Moda Black Party Dress')">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <div class="brand-name">Vero Moda</div>
+                        <div class="product-title">Bodycon Black Party Dress</div>
+                        <div class="price-row">
+                            <span class="current-price">₹1,899</span>
+                            <span class="original-price">₹3,499</span>
+                            <span class="discount-tag">(45% OFF)</span>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 600;">
+                            4.5 <i class="fa-solid fa-star" style="color: #ff905a; font-size: 12px;"></i> (1.1k)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 3: Summer Wrap Dress -->
+                <div class="product-card" onclick="openProductDetail()">
+                    <div class="product-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=500&q=80" alt="V-Neck Summer Wrap Dress">
+                        <button class="wishlist-btn-overlay" onclick="toggleWishlistProduct(event, this, 'Tokyo Talkies Summer Wrap Dress')">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <div class="brand-name">Tokyo Talkies</div>
+                        <div class="product-title">V-Neck Summer Wrap Dress</div>
+                        <div class="price-row">
+                            <span class="current-price">₹999</span>
+                            <span class="original-price">₹1,999</span>
+                            <span class="discount-tag">(50% OFF)</span>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 600;">
+                            4.2 <i class="fa-solid fa-star" style="color: #ff905a; font-size: 12px;"></i> (950)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product 4: Satin Slip Evening Dress -->
+                <div class="product-card" onclick="openProductDetail()">
+                    <div class="product-img-wrapper">
+                        <img src="https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=500&q=80" alt="Satin Slip Evening Dress">
+                        <button class="wishlist-btn-overlay" onclick="toggleWishlistProduct(event, this, 'MANGO Satin Evening Dress')">
+                            <i class="fa-regular fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <div class="brand-name">MANGO</div>
+                        <div class="product-title">Satin Slip Evening Dress</div>
+                        <div class="price-row">
+                            <span class="current-price">₹2,990</span>
+                            <span class="original-price">₹4,590</span>
+                            <span class="discount-tag">(35% OFF)</span>
+                        </div>
+                        <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px; font-weight: 600;">
+                            4.6 <i class="fa-solid fa-star" style="color: #ff905a; font-size: 12px;"></i> (1.7k)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-behavior">
+            <div class="comparison-container">
+                <div class="comparison-header">
+                    <h2>WishCue A/B Metrics</h2>
+                    <p>Live verification and business metrics from the A/B testing framework.</p>
+                </div>
+
+                <!-- Live Metrics Dashboard (Phase 5) -->
+                <div style="background: white; border-radius: 14px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 1px solid var(--border-color);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                        <span style="font-weight: 700; font-size: 15px; color: var(--text-main);">A/B Testing Framework</span>
+                        <span style="background: rgba(3, 166, 133, 0.1); color: var(--success-green); font-size: 12px; padding: 4px 10px; border-radius: 14px; font-weight: 700;">Live (Treatment Group)</span>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                        <div style="background: var(--bg-light); padding: 12px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 12px; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">CONVERSION LIFT</div>
+                            <div style="font-size: 24px; font-weight: 800; color: var(--myntra-pink);" id="metric-lift">+46.8%</div>
+                        </div>
+                        <div style="background: var(--bg-light); padding: 12px; border-radius: 10px; text-align: center;">
+                            <div style="font-size: 12px; color: var(--text-muted); font-weight: 700; margin-bottom: 4px;">AVG API LATENCY</div>
+                            <div style="font-size: 24px; font-weight: 800; color: var(--text-main);" id="metric-latency">33.0ms</div>
+                        </div>
+                    </div>
+                    
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 12px;">
+                        <div style="display: flex; justify-content: space-between; font-size: 14px; color: var(--text-muted); margin-bottom: 8px;">
+                            <span>Control Conv. Rate (Standard):</span>
+                            <span style="font-weight: 700; color: var(--text-main);" id="metric-control-rate">12.4%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 14px; color: var(--text-muted); margin-bottom: 8px;">
+                            <span>Treatment Conv. Rate (WishCue):</span>
+                            <span style="font-weight: 700; color: var(--success-green);" id="metric-treatment-rate">18.2%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 14px; color: var(--text-muted); margin-bottom: 8px;">
+                            <span>Nudge Click-Through Rate (CTR):</span>
+                            <span style="font-weight: 700; color: var(--text-main);" id="metric-nudge-ctr">25.0%</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 14px; color: var(--text-muted);">
+                            <span>Total Nudges Served (Telemetry):</span>
+                            <span style="font-weight: 700; color: var(--text-main);" id="metric-nudge-impressions">48</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-card before">
+                    <div class="flow-card-title" style="color: var(--text-muted);">
+                        <i class="fa-solid fa-bookmark"></i> BEFORE WishCue (Passive Bookmark)
+                    </div>
+                    <div class="flow-steps">
+                        <div class="flow-step"><i class="fa-solid fa-heart"></i> Save to Wishlist</div>
+                        <div class="flow-step"><i class="fa-solid fa-hourglass"></i> Wait & Forget <span class="muted">(Out of sight, out of mind)</span></div>
+                        <div class="flow-step"><i class="fa-solid fa-triangle-exclamation" style="color: #f0ad4e;"></i> Postpone Decision <span class="muted">(Lost intent)</span></div>
+                        <div class="flow-step"><i class="fa-solid fa-xmark" style="color: #d9534f;"></i> Lost purchase opportunity</div>
+                    </div>
+                </div>
+
+                <div class="flow-card after">
+                    <div class="flow-card-title" style="color: var(--myntra-pink);">
+                        <i class="fa-solid fa-bolt"></i> WITH WishCue (Active Reconsideration)
+                    </div>
+                    <div class="flow-steps">
+                        <div class="flow-step"><i class="fa-solid fa-heart"></i> Save to Wishlist <span class="muted">(Zero surveys/friction)</span></div>
+                        <div class="flow-step"><i class="fa-solid fa-sparkles"></i> Heart Glow <span class="muted">(Subtle signal that something is waiting)</span></div>
+                        <div class="flow-step"><i class="fa-solid fa-explosion"></i> Micro-Burst <span class="muted">(Contextual trigger notification)</span></div>
+                        <div class="flow-step"><i class="fa-solid fa-hand-pointer"></i> One-Tap Revisit <span class="muted">(Instant product context)</span></div>
+                        <div class="flow-step"><i class="fa-solid fa-bag-shopping"></i> Decide <span class="muted">(Buy Now or Keep in Wishlist)</span></div>
+                    </div>
+                </div>
+
+                <div class="promise-box">
+                    <h4>THE WishCue PROMISE</h4>
+                    <p>"WishCue doesn't push shoppers to buy. It helps them decide when they're ready through Timing + Information + Convenience."</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="screen-decision">
+            <div style="padding: 30px 16px; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                <div style="width: 70px; height: 70px; background: rgba(3, 166, 133, 0.1); color: var(--success-green); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; margin-bottom: 16px;">
+                    <i class="fa-solid fa-check"></i>
+                </div>
+                <h2 style="font-size: 22px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Decision Complete!</h2>
+                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5;">
+                    You successfully transitioned from a passive wishlist item to an active purchase decision using <strong>WishCue</strong>.
+                </p>
+                <div style="background: white; border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; width: 100%; text-align: left; margin-bottom: 24px;">
+                    <div style="font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px;">ORDER SUMMARY</div>
+                    <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px;">
+                        <span>H&M Floral Midi Dress (Size M)</span>
+                        <span style="font-weight: 700;">₹1,499</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--success-green);">
+                        <span>WishCue Re-engagement Conversion</span>
+                        <span>Successful</span>
+                    </div>
+                </div>
+                <button onclick="switchScreen('screen-home'); resetDemoState();" style="background: var(--myntra-pink); color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 700; width: 100%; cursor: pointer;">
+                    Restart Prototype Journey
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="demo-controller">
+        <div class="demo-title">
+            <span>⚡ WishCue API Evaluator Demo</span>
+            <span style="font-size: 10px; opacity: 0.8;" id="demo-status">Idle</span>
+        </div>
+        <div class="demo-buttons">
+            <button class="demo-btn" onclick="triggerWishCueScenario('search')">🔎 Similar Search</button>
+            <button class="demo-btn" onclick="triggerWishCueScenario('update')">🔔 Product Update</button>
+            <button class="demo-btn" onclick="triggerWishCueScenario('days')">⏳ 30-Day Window</button>
+        </div>
+    </div>
+
+    <nav class="bottom-nav">
+        <button class="nav-item active" id="nav-home" onclick="switchScreen('screen-home')">
+            <i class="fa-solid fa-house"></i>
+            <span>Home</span>
+        </button>
+        <button class="nav-item" id="nav-search" onclick="switchScreen('screen-search')">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span>Search</span>
+        </button>
+        <button class="nav-item" id="nav-wishlist" onclick="switchScreen('screen-wishlist')">
+            <i class="fa-regular fa-heart"></i>
+            <span>Wishlist</span>
+        </button>
+        <button class="nav-item" id="nav-behavior" onclick="switchScreen('screen-behavior')">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>WishCue</span>
+        </button>
+    </nav>
+</div>
+
+<script>
+    // Live Clock Update
+    function updateClock() {
+        const now = new Date();
+        let hours = now.getHours();
+        let minutes = now.getMinutes();
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        document.getElementById('current-time').innerText = `${hours}:${minutes}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
+    // App State Management & Wishlist Data Store
+    let isWishlisted = true;
+
+    const PRODUCT_CATALOG = {
+        "hm_jacket": { brand: "H&M", name: "Men Bomber Jacket", price: "₹1,999", originalPrice: "₹3,999", img: "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&w=500&q=80" },
+        "mango_shirt": { brand: "MANGO", name: "Slim Fit Solid Shirt", price: "₹2,290", originalPrice: "", img: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&w=500&q=80" },
+        "zara_blazer": { brand: "ZARA", name: "Textured Slim Blazer", price: "₹4,990", originalPrice: "", img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=500&q=80" },
+        "roadster_jacket": { brand: "Roadster", name: "Casual Denim Jacket", price: "₹1,799", originalPrice: "₹2,999", img: "https://images.unsplash.com/photo-1495105787522-5334e3ffa0ef?auto=format&fit=crop&w=500&q=80" },
+        "berrylush_dress": { brand: "Berrylush", name: "Floral Printed A-Line Dress", price: "₹1,299", originalPrice: "₹2,599", img: "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?auto=format&fit=crop&w=500&q=80" },
+        "veromoda_dress": { brand: "Vero Moda", name: "Bodycon Black Party Dress", price: "₹1,899", originalPrice: "₹3,499", img: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=500&q=80" },
+        "tokyo_dress": { brand: "Tokyo Talkies", name: "V-Neck Summer Wrap Dress", price: "₹999", originalPrice: "₹1,999", img: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=500&q=80" },
+        "mango_dress": { brand: "MANGO", name: "Satin Slip Evening Dress", price: "₹2,990", originalPrice: "₹4,590", img: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&w=500&q=80" }
+    };
+
+    let wishlistState = {
+        "hm_jacket": true,
+        "mango_shirt": false,
+        "zara_blazer": false,
+        "roadster_jacket": false,
+        "berrylush_dress": false,
+        "veromoda_dress": false,
+        "tokyo_dress": false,
+        "mango_dress": false
+    };
+
+    function switchScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(screenId).classList.add('active');
+
+        // Update Bottom Nav Active State
+        document.querySelectorAll('.bottom-nav .nav-item').forEach(n => n.classList.remove('active'));
+        if(screenId === 'screen-home') document.getElementById('nav-home').classList.add('active');
+        if(screenId === 'screen-search') document.getElementById('nav-search').classList.add('active');
+        if(screenId === 'screen-wishlist') {
+            document.getElementById('nav-wishlist').classList.add('active');
+            renderWishlistGrid(); // Dynamically render wishlist items
+        }
+        if(screenId === 'screen-behavior') {
+            document.getElementById('nav-behavior').classList.add('active');
+            loadAnalyticsDashboard(); // Fetch live metrics
+        }
+
+        // Close micro-burst if navigating away to wishlist or behavior screens
+        if(screenId === 'screen-wishlist' || screenId === 'screen-behavior') {
+            document.getElementById('micro-burst-banner').style.display = 'none';
+        }
+
+        // Scroll viewport to top
+        document.querySelector('.app-viewport').scrollTop = 0;
+    }
+
+    // Toast Message Controller
+    function showToast(message) {
+        const toast = document.getElementById('toast-notification');
+        document.getElementById('toast-text').innerText = message;
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 2000);
+    }
+
+    // Synchronize Header Wishlist Heart Icon (Phase 4 UI Fix)
+    function syncHeaderHeartIcon() {
+        const headerHeart = document.getElementById('header-heart-icon');
+        // Always keep the header heart icon as a clean outline (standard Myntra UI styling)
+        headerHeart.className = "fa-regular fa-heart";
+    }
+
+    // Toggle Wishlist from Home Card
+    function toggleWishlistFromHome(e) {
+        isWishlisted = !isWishlisted;
+        wishlistState["hm_jacket"] = isWishlisted; // Sync with dynamic store
+        const btn = document.getElementById('home-wishlist-icon');
+        const pdpBtn = document.getElementById('pdp-wishlist-btn');
+        const pdpHeart = document.getElementById('pdp-heart-icon');
+        const pdpText = document.getElementById('pdp-wishlist-text');
+
+        if(isWishlisted) {
+            btn.classList.add('active');
+            btn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+            showToast('Added H&M Men Bomber Jacket to Wishlist');
+            
+            if(pdpBtn) {
+                pdpBtn.classList.add('active');
+                pdpHeart.className = "fa-solid fa-heart";
+                pdpText.innerText = "WISHLISTED";
+            }
+        } else {
+            btn.classList.remove('active');
+            btn.innerHTML = '<i class="fa-regular fa-heart"></i>';
+            showToast('Removed H&M Men Bomber Jacket from Wishlist');
+            
+            if(pdpBtn) {
+                pdpBtn.classList.remove('active');
+                pdpHeart.className = "fa-regular fa-heart";
+                pdpText.innerText = "WISHLIST";
+            }
+        }
+        syncHeaderHeartIcon(); // Update header heart state
+    }
+
+    // Generic Wishlist Toggle for other products (Phase 4 UI Fix)
+    function toggleWishlistProduct(e, btn, productName) {
+        e.stopPropagation();
+        const icon = btn.querySelector('i');
+        const isActive = btn.classList.toggle('active');
+        
+        let prodId = "";
+        if (productName.includes("MANGO Shirt")) prodId = "mango_shirt";
+        else if (productName.includes("MANGO Satin") || productName.includes("Satin")) prodId = "mango_dress";
+        else if (productName.includes("ZARA")) prodId = "zara_blazer";
+        else if (productName.includes("Roadster")) prodId = "roadster_jacket";
+        else if (productName.includes("Berrylush") || productName.includes("Floral")) prodId = "berrylush_dress";
+        else if (productName.includes("Vero Moda") || productName.includes("Black")) prodId = "veromoda_dress";
+        else if (productName.includes("Tokyo") || productName.includes("Wrap")) prodId = "tokyo_dress";
+        
+        if (prodId) {
+            wishlistState[prodId] = isActive; // Sync with dynamic store
+        }
+        
+        if (isActive) {
+            icon.className = "fa-solid fa-heart";
+            showToast(`Added ${productName} to Wishlist`);
+        } else {
+            icon.className = "fa-regular fa-heart";
+            showToast(`Removed ${productName} from Wishlist`);
+        }
+        syncHeaderHeartIcon(); // Update header heart state
+    }
+
+    // Toggle Wishlist from PDP
+    function toggleWishlistFromPDP() {
+        isWishlisted = !isWishlisted;
+        wishlistState["hm_jacket"] = isWishlisted; // Sync with dynamic store
+        const btn = document.getElementById('pdp-wishlist-btn');
+        const heart = document.getElementById('pdp-heart-icon');
+        const text = document.getElementById('pdp-wishlist-text');
+        const homeBtn = document.getElementById('home-wishlist-icon');
+
+        if(isWishlisted) {
+            btn.classList.add('active');
+            heart.className = "fa-solid fa-heart";
+            text.innerText = "WISHLISTED";
+            if(homeBtn) {
+                homeBtn.classList.add('active');
+                homeBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+            }
+            showToast('Added H&M Men Bomber Jacket to Wishlist');
+        } else {
+            btn.classList.remove('active');
+            heart.className = "fa-regular fa-heart";
+            text.innerText = "WISHLIST";
+            if(homeBtn) {
+                homeBtn.classList.remove('active');
+                homeBtn.innerHTML = '<i class="fa-regular fa-heart"></i>';
+            }
+            showToast('Removed H&M Men Bomber Jacket from Wishlist');
+        }
+        syncHeaderHeartIcon(); // Update header heart state
+    }
+
+    // Render Dynamic Wishlist Grid (Phase 4 UI Fix)
+    function renderWishlistGrid() {
+        const grid = document.getElementById('wishlist-product-grid');
+        const countLabel = document.getElementById('wishlist-count-label');
+        grid.innerHTML = '';
+        
+        let count = 0;
+        for (const [prodId, isSaved] of Object.entries(wishlistState)) {
+            if (isSaved) {
+                count++;
+                const prod = PRODUCT_CATALOG[prodId];
+                
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.onclick = () => openProductDetail();
+                
+                let originalPriceHTML = prod.originalPrice ? `<span class="original-price">${prod.originalPrice}</span>` : '';
+                
+                card.innerHTML = `
+                    <div class="product-img-wrapper">
+                        <img src="${prod.img}" alt="${prod.name}">
+                        <button class="wishlist-btn-overlay active" onclick="removeWishlistItem(event, '${prodId}')">
+                            <i class="fa-solid fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="product-info">
+                        <div class="brand-name">${prod.brand}</div>
+                        <div class="product-title">${prod.name}</div>
+                        <div class="price-row">
+                            <span class="current-price">${prod.price}</span>
+                            ${originalPriceHTML}
+                        </div>
+                        <button style="width: 100%; margin-top: 10px; background: var(--myntra-pink); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 14px; font-weight: 700;" onclick="event.stopPropagation(); switchScreen('screen-pdp');">
+                            Move to Bag
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+        }
+        
+        countLabel.innerText = `(${count} item${count !== 1 ? 's' : ''})`;
+        
+        if (count === 0) {
+            grid.innerHTML = `
+                <div style="grid-column: 1 / span 2; text-align: center; padding: 40px 16px; color: var(--text-muted);">
+                    <i class="fa-regular fa-heart" style="font-size: 48px; margin-bottom: 12px; color: var(--border-color);"></i>
+                    <p style="font-size: 14px;">Your Wishlist is empty.</p>
+                </div>
+            `;
+        }
+    }
+
+    // Remove Item from Wishlist Screen (Phase 4 UI Fix)
+    function removeWishlistItem(e, prodId) {
+        e.stopPropagation();
+        wishlistState[prodId] = false;
+        
+        if (prodId === "hm_jacket") {
+            isWishlisted = false;
+            const btn = document.getElementById('home-wishlist-icon');
+            if(btn) {
+                btn.classList.remove('active');
+                btn.innerHTML = '<i class="fa-regular fa-heart"></i>';
+            }
+        } else {
+            const buttons = {
+                "mango_shirt": { index: 1 },
+                "zara_blazer": { index: 2 },
+                "roadster_jacket": { index: 3 }
+            };
+            const item = buttons[prodId];
+            if (item) {
+                const homeGrid = document.querySelector('#screen-home .product-grid');
+                if (homeGrid) {
+                    const cards = homeGrid.querySelectorAll('.product-card');
+                    const targetCard = cards[item.index];
+                    if (targetCard) {
+                        const overlayBtn = targetCard.querySelector('.wishlist-btn-overlay');
+                        if (overlayBtn) {
+                            overlayBtn.classList.remove('active');
+                            overlayBtn.querySelector('i').className = "fa-regular fa-heart";
+                        }
+                    }
+                }
+            }
+        }
+        
+        renderWishlistGrid();
+        showToast(`Removed item from Wishlist`);
+    }
+
+    function openProductDetail() {
+        // Ensure wishlist state syncs to PDP
+        const pdpBtn = document.getElementById('pdp-wishlist-btn');
+        const pdpHeart = document.getElementById('pdp-heart-icon');
+        const pdpText = document.getElementById('pdp-wishlist-text');
+        
+        if(isWishlisted) {
+            pdpBtn.classList.add('active');
+            pdpHeart.className = "fa-solid fa-heart";
+            pdpText.innerText = "WISHLISTED";
+        } else {
+            pdpBtn.classList.remove('active');
+            pdpHeart.className = "fa-regular fa-heart";
+            pdpText.innerText = "WISHLIST";
+        }
+
+        switchScreen('screen-pdp');
+    }
+
+    // Trigger WishCue Scenarios (Evaluates via dynamic server API)
+    // Sparkle Burst Particle Generator
+    function createSparkleBurst(anchorElement) {
+        const rect = anchorElement.getBoundingClientRect();
+        const container = document.body;
+        
+        // Spawn 15 golden sparkle particles
+        for (let i = 0; i < 15; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'sparkle-particle';
+            
+            // Start at the center of the anchor element
+            const startX = rect.left + rect.width / 2;
+            const startY = rect.top + rect.height / 2;
+            
+            particle.style.left = `${startX}px`;
+            particle.style.top = `${startY}px`;
+            
+            // Random direction and distance (30px to 80px)
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 30 + Math.random() * 50;
+            const tx = Math.cos(angle) * distance;
+            const ty = Math.sin(angle) * distance;
+            
+            particle.style.setProperty('--tx', `${tx}px`);
+            particle.style.setProperty('--ty', `${ty}px`);
+            
+            container.appendChild(particle);
+            
+            // Clean up particle after animation finishes
+            setTimeout(() => {
+                particle.remove();
+            }, 800);
+        }
+    }
+
+    // Configurable API base for Vercel / Railway cloud deployment
+    // Defaults to empty string to seamlessly leverage vercel.json reverse-proxy rewrites or local same-origin
+    const API_BASE = (window.ENV_API_BASE || '').replace(/\/$/, '');
+
+    let autoDismissTimer = null;
+
+    // Send Telemetry Event (Phase 5)
+    async function sendTelemetryEvent(eventName) {
+        try {
+            await fetch(`${API_BASE}/v1/analytics/event?event=${eventName}`);
+        } catch (e) {
+            console.error("Telemetry failed", e);
+        }
+    }
+
+    // Load Live Analytics Stats (Phase 5)
+    async function loadAnalyticsDashboard() {
+        try {
+            const response = await fetch(`${API_BASE}/v1/analytics`);
+            if (!response.ok) throw new Error("Failed to load metrics");
+            const data = await response.json();
+            
+            // Update Dashboard UI
+            document.getElementById('metric-lift').innerText = `+${data.improvement}%`;
+            document.getElementById('metric-latency').innerText = `${data.avgLatencyMs}ms`;
+            document.getElementById('metric-control-rate').innerText = `${data.control.conversionRate}%`;
+            document.getElementById('metric-treatment-rate').innerText = `${data.treatment.conversionRate}%`;
+            document.getElementById('metric-nudge-ctr').innerText = `${data.treatment.nudgeCTR}%`;
+            document.getElementById('metric-nudge-impressions').innerText = data.treatment.nudgeImpressions;
+        } catch (error) {
+            console.error("Error loading dashboard metrics:", error);
+        }
+    }
+
+    async function triggerWishCueScenario(type) {
+        const headerBtn = document.getElementById('wishlist-header-btn');
+        const headerHeart = document.getElementById('header-heart-icon');
+        const banner = document.getElementById('micro-burst-banner');
+        const titleEl = document.getElementById('mb-title');
+        const descEl = document.getElementById('mb-desc');
+        const demoStatus = document.getElementById('demo-status');
+
+        demoStatus.innerText = "Querying live API endpoint...";
+
+        // Check if wishlist is empty (Phase 4 Logic Safeguard)
+        const hasWishlistItems = Object.values(wishlistState).some(val => val === true);
+        if (!hasWishlistItems) {
+            demoStatus.innerText = "Nudge Skipped: Wishlist is empty (No items to re-engage)";
+            showToast("Wishlist is empty! Add items first.");
+            return;
+        }
+
+        // Find active wishlisted product to demonstrate the nudge
+        const activeItemKey = Object.keys(wishlistState).find(key => wishlistState[key] === true);
+        const activeItem = PRODUCT_CATALOG[activeItemKey] || { brand: "H&M", name: "Men Bomber Jacket", price: "₹1,999" };
+
+        // Clear any active auto-dismiss timer
+        if (autoDismissTimer) clearTimeout(autoDismissTimer);
+
+        try {
+            // Request dynamic nudge configuration from the live Python server API
+            const response = await fetch(`${API_BASE}/v1/users/usr_987654/nudges?triggerType=${type}&productName=${encodeURIComponent(activeItem.name)}&productBrand=${encodeURIComponent(activeItem.brand)}&productPrice=${encodeURIComponent(activeItem.price)}`);
+            if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+            
+            const data = await response.json();
+            
+            if (data.nudge) {
+                // Apply the Groq-generated or dynamic backend copywriting
+                titleEl.innerHTML = `💥 ${data.nudge.title} 👀`;
+                descEl.innerText = data.nudge.copywriterText;
+                demoStatus.innerText = `Nudge Active (Score: ${data.nudge.score})`;
+
+                // 1. Trigger Golden Sparkle Burst right next to wishlist heart button
+                createSparkleBurst(headerBtn);
+
+                // 2. ❤️✨ HEART GLOW TRIGGER
+                headerBtn.classList.add('heart-glow');
+                headerHeart.className = "fa-solid fa-heart";
+
+                // 3. 💥 MICRO-BURST POPUP (Sleek Floating Pill Capsule next to the anchor)
+                setTimeout(() => {
+                    banner.style.display = 'block';
+                    // Record impression telemetry event
+                    sendTelemetryEvent('impression');
+                }, 400);
+
+                // 4. Auto-dismiss after 5 seconds to prevent browsing disruption
+                autoDismissTimer = setTimeout(() => {
+                    dismissMicroBurst();
+                }, 5000);
+            } else {
+                demoStatus.innerText = `Nudge Skipped: ${data.reason || 'No match'}`;
+            }
+        } catch (error) {
+            console.error(error);
+            demoStatus.innerText = `API Error: ${error.message}`;
+        }
+    }
+
+    function dismissMicroBurst() {
+        if (autoDismissTimer) clearTimeout(autoDismissTimer);
+        document.getElementById('micro-burst-banner').style.display = 'none';
+        document.getElementById('wishlist-header-btn').classList.remove('heart-glow');
+        document.getElementById('demo-status').innerText = "Dismissed (Browsing continues)";
+        sendTelemetryEvent('dismiss'); // Record dismiss telemetry event
+        syncHeaderHeartIcon(); // Restore correct header heart outline/filled state
+    }
+
+    function takeLookFromBurst() {
+        if (autoDismissTimer) clearTimeout(autoDismissTimer);
+        document.getElementById('micro-burst-banner').style.display = 'none';
+        document.getElementById('wishlist-header-btn').classList.remove('heart-glow');
+        document.getElementById('demo-status').innerText = "Revisited via WishCue";
+        sendTelemetryEvent('click'); // Record click telemetry event
+        syncHeaderHeartIcon(); // Restore correct header heart outline/filled state
+        openProductDetail();
+    }
+
+    function checkSearchTrigger(val) {
+        if(val.toLowerCase().includes('party') || val.toLowerCase().includes('black') || val.toLowerCase().includes('floral') || val.toLowerCase().includes('jacket')) {
+            setTimeout(() => {
+                triggerWishCueScenario('search');
+            }, 600);
+        }
+    }
+
+    function triggerSimilarSearchQuery(term = "Floral midi dress") {
+        document.getElementById('search-input-field').value = term;
+        triggerWishCueScenario('search');
+    }
+
+    function resetDemoState() {
+        isWishlisted = true;
+        // Reset wishlistState map
+        wishlistState = {
+            "hm_jacket": true,
+            "mango_shirt": false,
+            "zara_blazer": false,
+            "roadster_jacket": false
+        };
+        // Reset all home and header button states
+        document.querySelectorAll('.wishlist-btn-overlay').forEach(btn => {
+            btn.classList.remove('active');
+            const icon = btn.querySelector('i');
+            if(icon) icon.className = "fa-regular fa-heart";
+        });
+        const hmBtn = document.getElementById('home-wishlist-icon');
+        if (hmBtn) {
+            hmBtn.classList.add('active');
+            hmBtn.innerHTML = '<i class="fa-solid fa-heart"></i>';
+        }
+        document.getElementById('header-heart-icon').className = "fa-regular fa-heart";
+        document.getElementById('wishlist-header-btn').classList.remove('heart-glow');
+        document.getElementById('micro-burst-banner').style.display = 'none';
+        document.getElementById('demo-status').innerText = "Idle";
+    }
+
+    // Desktop View Scale Controller
+    function setDisplayScale(scale, btn) {
+        document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+        const container = document.getElementById('device-container');
+        if (container) {
+            container.style.zoom = scale;
+        }
+        localStorage.setItem('wishcue_display_scale', scale);
+    }
+
+    // Initialize default Wishlist render on first load
+    renderWishlistGrid();
+
+    // Restore saved scale on load or default to 1.15
+    const savedScale = localStorage.getItem('wishcue_display_scale') || '1.15';
+    const scaleButtons = document.querySelectorAll('.size-btn');
+    let matchedScale = false;
+    scaleButtons.forEach(b => {
+        if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(savedScale)) {
+            setDisplayScale(parseFloat(savedScale), b);
+            matchedScale = true;
+        }
+    });
+    if (!matchedScale && scaleButtons.length > 1) {
+        setDisplayScale(1.15, scaleButtons[1]);
+    }
+</script>
+
+</body>
+</html>
