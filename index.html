@@ -1300,11 +1300,8 @@
 
     <div class="demo-controller">
         <div class="demo-title">
-            <span>⚡ WishCue API Evaluator Demo</span>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 11px; cursor: pointer; text-decoration: underline; color: var(--myntra-pink); font-weight: 700;" onclick="promptBackendUrl()">⚙️ Connect Backend</span>
-                <span style="font-size: 11px; opacity: 0.85;" id="demo-status">Ready</span>
-            </div>
+            <span>⚡ WishCue Evaluator</span>
+            <span style="font-size: 11px; font-weight: 700; color: var(--success-green);" id="demo-status">● Ready</span>
         </div>
         <div class="demo-buttons">
             <button class="demo-btn" onclick="triggerWishCueScenario('search')">🔎 Similar Search</button>
@@ -1817,7 +1814,13 @@
         if (autoDismissTimer) clearTimeout(autoDismissTimer);
         document.getElementById('micro-burst-banner').style.display = 'none';
         document.getElementById('wishlist-header-btn').classList.remove('heart-glow');
-        document.getElementById('demo-status').innerText = "Dismissed (Browsing continues)";
+        document.getElementById('demo-status').innerHTML = "<span style='color: var(--text-muted);'>Dismissed</span>";
+        setTimeout(() => {
+            const statusEl = document.getElementById('demo-status');
+            if (statusEl && statusEl.innerText === "Dismissed") {
+                statusEl.innerHTML = "<span style='color: var(--success-green); font-weight: 700;'>● Ready</span>";
+            }
+        }, 2000);
         sendTelemetryEvent('dismiss'); // Record dismiss telemetry event
         syncHeaderHeartIcon(); // Restore correct header heart outline/filled state
     }
@@ -1868,7 +1871,7 @@
         document.getElementById('header-heart-icon').className = "fa-regular fa-heart";
         document.getElementById('wishlist-header-btn').classList.remove('heart-glow');
         document.getElementById('micro-burst-banner').style.display = 'none';
-        document.getElementById('demo-status').innerText = "Idle";
+        document.getElementById('demo-status').innerHTML = "<span style='color: var(--success-green); font-weight: 700;'>● Ready</span>";
     }
 
     // Desktop View Scale Controller
