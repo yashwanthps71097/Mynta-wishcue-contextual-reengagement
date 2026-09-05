@@ -185,7 +185,7 @@
             min-height: 100%;
             flex-direction: column;
             background: var(--bg-light);
-            padding-bottom: 70px;
+            padding-bottom: 195px;
         }
 
         .screen.active {
@@ -342,58 +342,161 @@
             display: none;
         }
 
-        /* Demo Trigger Floating Controller */
+        /* Demo Trigger Floating Controller (Evaluator Sandbox) */
         .demo-controller {
             position: absolute;
-            bottom: 78px;
-            left: 12px;
-            right: 12px;
+            bottom: 74px;
+            left: 10px;
+            right: 10px;
             background: rgba(255, 255, 255, 0.98);
-            backdrop-filter: blur(8px);
-            padding: 12px 14px;
+            backdrop-filter: blur(10px);
+            padding: 9px 12px 11px 12px;
             border-radius: 14px;
             z-index: 1500;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            border: 1px solid var(--border-color);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), 0 0 0 1.5px rgba(255, 63, 108, 0.25);
+            border: 1px solid #ffd1dc;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .demo-title {
-            font-size: 15px;
-            font-weight: 700;
-            color: var(--myntra-pink);
-            text-transform: uppercase;
-            letter-spacing: 0.8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
+        .evaluator-live-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+            font-size: 10.5px;
+            font-weight: 800;
+            padding: 2px 7px;
+            border-radius: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .live-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #10b981;
+            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            animation: pulse-live 2s infinite;
+        }
+
+        @keyframes pulse-live {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 5px rgba(16, 185, 129, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .demo-instruction {
+            background: #fff5f7;
+            border: 1px solid #fecdd3;
+            border-radius: 7px;
+            padding: 5px 8px;
+            font-size: 12px;
+            color: #1f2937;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            line-height: 1.35;
+        }
+
+        .demo-instruction strong {
+            color: #e11d48;
+            font-weight: 800;
+        }
+
+        .instruction-icon {
+            color: #ff3f6c;
+            font-size: 13px;
+            flex-shrink: 0;
+            animation: bounce-icon 1.5s infinite;
+        }
+
+        @keyframes bounce-icon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(2px); }
+        }
+
         .demo-buttons {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: 6px;
         }
 
         .demo-btn {
-            background: var(--bg-light);
-            color: var(--text-main);
-            border: 1px solid var(--border-color);
-            padding: 9px 4px;
+            background: #ffffff;
+            color: #111827;
+            border: 1.5px solid #e5e7eb;
+            padding: 7px 4px;
             border-radius: 8px;
-            font-size: 14.5px;
+            font-size: 12px;
             font-weight: 700;
             cursor: pointer;
             text-align: center;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .demo-btn .btn-icon {
+            font-size: 14px;
+        }
+
+        .demo-btn .btn-text {
+            font-size: 11px;
+            white-space: nowrap;
         }
 
         .demo-btn:hover {
-            background: var(--myntra-pink);
-            border-color: var(--myntra-pink);
-            color: var(--white);
+            background: #ff3f6c;
+            border-color: #ff3f6c;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(255, 63, 108, 0.3);
+        }
+
+        .demo-btn:active, .demo-btn.active-scenario {
+            background: #ff3f6c;
+            border-color: #ff3f6c;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(255, 63, 108, 0.4);
+        }
+
+        .demo-status-pill {
+            font-size: 11.5px;
+            font-weight: 600;
+            color: #047857;
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .nav-badge-metrics {
+            position: absolute;
+            top: 4px;
+            right: 12px;
+            background: #ff3f6c;
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: 800;
+            padding: 1px 5px;
+            border-radius: 8px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
         }
 
         /* Common Component Styling */
@@ -1244,16 +1347,35 @@
 
     </div>
 
-    <div class="demo-controller">
+    <div class="demo-controller" id="demo-controller-bar">
         <div class="demo-title">
-            <span>⚡ WishCue Evaluator</span>
-            <span id="demo-status" style="display: none;"></span>
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <i class="fa-solid fa-bolt" style="color: #ff3f6c; font-size: 13px;"></i>
+                <span style="color: #1f2937; font-weight: 800; font-size: 13px; letter-spacing: 0.3px;">WISHCUE EVALUATOR SANDBOX</span>
+            </div>
+            <span class="evaluator-live-tag">
+                <span class="live-dot"></span> LIVE TEST
+            </span>
+        </div>
+        <div class="demo-instruction">
+            <i class="fa-solid fa-hand-pointer instruction-icon"></i>
+            <span><strong>Evaluator Guide:</strong> Tap any scenario below to trigger live AI re-engagement:</span>
         </div>
         <div class="demo-buttons">
-            <button class="demo-btn" onclick="triggerWishCueScenario('search')">🔎 Similar Search</button>
-            <button class="demo-btn" onclick="triggerWishCueScenario('update')">🔔 Product Update</button>
-            <button class="demo-btn" onclick="triggerWishCueScenario('days')">⏳ 30-Day Window</button>
+            <button class="demo-btn" id="demo-btn-search" onclick="triggerWishCueScenario('search')">
+                <span class="btn-icon">🔎</span>
+                <span class="btn-text">Similar Search</span>
+            </button>
+            <button class="demo-btn" id="demo-btn-update" onclick="triggerWishCueScenario('update')">
+                <span class="btn-icon">🔔</span>
+                <span class="btn-text">Product Update</span>
+            </button>
+            <button class="demo-btn" id="demo-btn-days" onclick="triggerWishCueScenario('days')">
+                <span class="btn-icon">⏳</span>
+                <span class="btn-text">30-Day Window</span>
+            </button>
         </div>
+        <div id="demo-status" class="demo-status-pill" style="display: none;"></div>
     </div>
 
     <nav class="bottom-nav">
@@ -1269,7 +1391,8 @@
             <i class="fa-regular fa-heart"></i>
             <span>Wishlist</span>
         </button>
-        <button class="nav-item" id="nav-behavior" onclick="switchScreen('screen-behavior')">
+        <button class="nav-item" id="nav-behavior" onclick="switchScreen('screen-behavior')" style="position: relative;">
+            <span class="nav-badge-metrics">Metrics</span>
             <i class="fa-solid fa-chart-line"></i>
             <span>WishCue</span>
         </button>
@@ -1672,12 +1795,20 @@
         const descEl = document.getElementById('mb-desc');
         const demoStatus = document.getElementById('demo-status');
 
-        demoStatus.innerText = "Evaluating re-engagement cue...";
+        if (demoStatus) {
+            demoStatus.style.display = "block";
+            demoStatus.innerHTML = "<span style='color: #0284c7; font-weight: 700;'>⚡ Evaluating scenario...</span>";
+        }
+
+        // Highlight active button
+        document.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active-scenario'));
+        const clickedBtn = document.getElementById(`demo-btn-${type}`);
+        if (clickedBtn) clickedBtn.classList.add('active-scenario');
 
         // Check if wishlist is empty (Phase 4 Logic Safeguard)
         const hasWishlistItems = Object.values(wishlistState).some(val => val === true);
         if (!hasWishlistItems) {
-            demoStatus.innerText = "Nudge Skipped: Wishlist is empty";
+            if (demoStatus) demoStatus.innerHTML = "<span style='color: #dc2626; font-weight: 700;'>Nudge Skipped: Wishlist is empty</span>";
             showToast("Wishlist is empty! Add items first.");
             return;
         }
@@ -1733,9 +1864,12 @@
         if (nudgePayload) {
             titleEl.innerHTML = `💥 ${nudgePayload.title} 👀`;
             descEl.innerText = nudgePayload.copywriterText;
-            demoStatus.innerHTML = isLiveRailway
-                ? `<span style="color: #03a685; font-weight: 700;">● Live Railway API</span> (Score: ${nudgePayload.score})`
-                : `<span style="color: var(--myntra-pink); font-weight: 700;">⚡ WishCue Active</span> (Score: ${nudgePayload.score})`;
+            if (demoStatus) {
+                demoStatus.style.display = "block";
+                demoStatus.innerHTML = isLiveRailway
+                    ? `<span style="color: #047857; font-weight: 700;">● Live Cloud API</span> · Score: ${nudgePayload.score}`
+                    : `<span style="color: #be185d; font-weight: 700;">⚡ WishCue Dynamic Nudge</span> · Score: ${nudgePayload.score}`;
+            }
 
             // 1. Trigger Golden Sparkle Burst right next to wishlist heart button
             createSparkleBurst(headerBtn);
@@ -1761,13 +1895,14 @@
         if (autoDismissTimer) clearTimeout(autoDismissTimer);
         document.getElementById('micro-burst-banner').style.display = 'none';
         document.getElementById('wishlist-header-btn').classList.remove('heart-glow');
-        document.getElementById('demo-status').innerHTML = "<span style='color: var(--text-muted);'>Dismissed</span>";
-        setTimeout(() => {
-            const statusEl = document.getElementById('demo-status');
-            if (statusEl && statusEl.innerText === "Dismissed") {
-                statusEl.innerHTML = "<span style='color: var(--success-green); font-weight: 700;'>● Ready</span>";
-            }
-        }, 2000);
+        document.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active-scenario'));
+        const demoStatus = document.getElementById('demo-status');
+        if (demoStatus) {
+            demoStatus.innerHTML = "<span style='color: #6b7280;'>Pill Dismissed</span>";
+            setTimeout(() => {
+                demoStatus.style.display = 'none';
+            }, 1800);
+        }
         sendTelemetryEvent('dismiss'); // Record dismiss telemetry event
         syncHeaderHeartIcon(); // Restore correct header heart outline/filled state
     }
