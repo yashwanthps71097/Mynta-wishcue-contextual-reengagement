@@ -170,16 +170,23 @@ class WishCueAppRequestHandler(http.server.SimpleHTTPRequestHandler):
 
         # Route: Serve Main Frontend
         if parsed_url.path == "/" or parsed_url.path == "/index.html":
+            backend_index = os.path.join(os.path.dirname(__file__), "index.html")
             parent_index = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "index.html"))
+            target = None
             if os.path.exists("index.html"):
-                self.path = "index.html"
-                return http.server.SimpleHTTPRequestHandler.do_GET(self)
+                target = "index.html"
+            elif os.path.exists(backend_index):
+                target = backend_index
             elif os.path.exists(parent_index):
+                target = parent_index
+
+            if target:
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html; charset=utf-8")
                 self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
                 self.end_headers()
-                with open(parent_index, "rb") as f:
+                with open(target, "rb") as f:
                     self.wfile.write(f.read())
                 return
 
