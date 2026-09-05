@@ -76,6 +76,8 @@ To prevent serverless build conflicts on Vercel, the codebase maintains a clean 
 ├── DESIGN/                        # High-resolution generated UI assets
 ├── index.html                     # Self-contained Myntra WishCue Frontend SPA
 ├── vercel.json                    # Vercel static routing & reverse-proxy rewrites
+├── mise.toml                      # Railway mise config (disables GitHub attestation check)
+├── nixpacks.toml                  # Nixpacks Python 3.12 build provider configuration
 ├── .vercelignore                  # Excludes Python files from Vercel static builds
 ├── .gitignore                     # Protects local environment secrets (.env)
 └── DEPLOYMENT_GUIDE.md            # Cloud deployment procedures
